@@ -184,7 +184,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
 
     def set_uniform_frequency_ranges(self):
         if self.current_mode_name=='Uniform Mode':
-            frequencies= Mode.compute_fft(self.original_signal.amplitude_data, self.original_signal.sampling_rate)[1]
+            frequencies= self.frequencies_of_signal
             max_freq=np.max(frequencies)
             start,end=0,max_freq/10
             for i in range (1, 11):

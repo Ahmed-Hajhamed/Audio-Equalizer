@@ -2,8 +2,7 @@ from PyQt5 import QtCore, QtWidgets
 from Graph import Graph
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from MediaPlayer import RealTimeMediaPlayer
-from mixertest import AudioPlayerWidget
+
 class spectrogramPlot(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
@@ -292,6 +291,3 @@ class Ui_MainWindow(object):
         self.frequency_label.setText(_translate("MainWindow", "Frequency Scale:"))
         self.originalSpectrugramLabel.setText(_translate("MainWindow", "Original Spectrugram"))
         self.frequencyDomainLabel.setText(_translate("MainWindow", "Frequency Domain"))
-
-
-

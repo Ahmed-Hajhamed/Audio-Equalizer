@@ -109,8 +109,6 @@ class Graph():
 
     def reconstruct_signal_on_equalized_plot(self, time, re_signal):
         self.remove_old_curve()
-        # self.signal[1]=re_signal
-        # new_time = np.arange(0 , len(re_signal)/1000, 1/1000)
         self.signal = np.array([time, re_signal])
         if Graph.current_index < len(self.signal[0]):
             self.curve =self.plot_widget.plot(self.signal[0][:Graph.current_index],

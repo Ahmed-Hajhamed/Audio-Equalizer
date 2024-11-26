@@ -13,7 +13,6 @@ def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
     positive_magnitude = magnitude[:len(magnitude) // 2]
     return  [positive_freqs, positive_magnitude]
 
-
 def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):
     fft_result, frequencies = fft_of_signal, frequencies_of_signal
     modified_fft = fft_result.copy()
@@ -22,16 +21,14 @@ def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):
         low, high = band_edges[slider_idx][0], band_edges[slider_idx][1]
         band_mask = np.where((frequencies >= low) & (frequencies < high))
         modified_fft[band_mask] *= slider_value
-    reconstructed_signal = reconstruct_signal(modified_fft)
+    reconstructed_signal =  np.fft.ifft(modified_fft).real
     return reconstructed_signal, modified_fft
 
 
 def reconstruct_signal(modified_fft):
     reconstructed_signal = np.fft.ifft(modified_fft).real
     return reconstructed_signal
-
-
-                            
+                   
 def plot_spectrogram(signal, sampling_rate, canvas):
     """
     Plot spectrogram using Matplotlib.
