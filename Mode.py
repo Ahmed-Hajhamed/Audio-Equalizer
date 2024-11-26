@@ -6,16 +6,16 @@ def compute_fft(signal_amplitudes, sampling_rate):
     frequencies =   np.fft.fftfreq(len(signal_amplitudes), d=1 /sampling_rate)
     return fft_result, frequencies
 
-def get_full_frequency_domain(signal_amplitudes, sampling_rate):
-    fft_result, frequencies = compute_fft(signal_amplitudes, sampling_rate)
+def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
+    fft_result, frequencies = fft_of_signal, frequencies_of_signal
     positive_freqs = frequencies[:len(frequencies) // 2]
     magnitude=np.abs(fft_result)
     positive_magnitude = magnitude[:len(magnitude) // 2]
     return  [positive_freqs, positive_magnitude]
 
 
-def apply_gain(signal_amplitudes, slider_values, band_edges, sampling_rate):
-    fft_result, frequencies = compute_fft(signal_amplitudes, sampling_rate)
+def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):
+    fft_result, frequencies = fft_of_signal, frequencies_of_signal
     modified_fft = fft_result.copy()
     for slider_idx, slider_value in enumerate(slider_values):
         slider_value = 2 ** (slider_value/50)
@@ -23,7 +23,7 @@ def apply_gain(signal_amplitudes, slider_values, band_edges, sampling_rate):
         band_mask = np.where((frequencies >= low) & (frequencies < high))
         modified_fft[band_mask] *= slider_value
     reconstructed_signal = reconstruct_signal(modified_fft)
-    return reconstructed_signal
+    return reconstructed_signal, modified_fft
 
 
 def reconstruct_signal(modified_fft):

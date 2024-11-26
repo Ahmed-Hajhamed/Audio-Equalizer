@@ -39,7 +39,7 @@ class Signal:
 
         if self.mode == 'Music' or  self.mode =='Animal Sounds' or  self.mode =='Uniform Mode':
             self.frquencies_ranges = available_frequencies[self.mode]
-            signal_data, self.sampling_rate = librosa.load(self.file_path)
+            signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100)
             self.duration = librosa.get_duration(y=signal_data, sr=self.sampling_rate)
             self.time_data = np.linspace(0, len(signal_data)/ self.sampling_rate, len(signal_data))
             self.amplitude_data = signal_data

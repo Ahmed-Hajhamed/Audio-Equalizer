@@ -11,7 +11,8 @@ import MySignal
 import Audiogram
 import soundfile as sf
 import csv
-
+from mixertest import AudioPlayerWidget
+import tempfile
 class MainWindow(QMainWindow, UI.Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -26,7 +27,8 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.frequency_domain=None
         self.number_of_sliders = 10
         self.slider_values = []
-        
+        self.fft_of_signal = None
+        self.frequencies_of_signal = None
         self.linearScaleRadioButton.setChecked(True)
         self.spectrugramCheckBox.setChecked(True)
         self.spectrugramCheckBox.stateChanged.connect(self.hide_show_spectrogram)
@@ -44,6 +46,9 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.linearScaleRadioButton.toggled.connect(self.switch_audiogram_linear_scale)
         self.audiogramRadioButton.toggled.connect(self.switch_audiogram_linear_scale)
         self.load_signal()
+        self.switch_audiogram_linear_scale()
+        self.original_media_player.set_other_players([self.equlized_media_player])
+        self.equlized_media_player.set_other_players([self.original_media_player])
 
     def load_signal(self):
         if self.original_signal is None:
@@ -54,42 +59,25 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.signal_file_path=file_path
             self.original_signal= MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
             self.equalized_signal=copy.deepcopy(self.original_signal)
-
+            self.fft_of_signal, self.frequencies_of_signal = Mode.compute_fft(self.equalized_signal.amplitude_data,
+                                                                               self.equalized_signal.sampling_rate)
             self.band_edges = list(self.original_signal.frquencies_ranges.values())
-            self.originalGraph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
-            self.equalizedGraph.add_signal([self.equalized_signal.time_data, self.equalized_signal.amplitude_data])
-
-            Audiogram.plotAudiogram(self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate, 
-                                                                                    self.audiogramPlot)
-            self.frequency_domain = Mode.get_full_frequency_domain(self.equalized_signal.amplitude_data, 
-                                                                   self.equalized_signal.sampling_rate)
-            self.frequencyDomainPlot.remove_old_curve()
-            self.frequencyDomainPlot.add_signal(self.frequency_domain, start = False, color = 'r')
-            Mode.plot_spectrogram(self.original_signal.amplitude_data,
-                                   self.original_signal.sampling_rate, self.originalSpectrugram)
-            Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
-                                  self.equalized_signal.sampling_rate, self.equalizedSpecrtugram)
-            self.switch_audiogram_linear_scale()
-            
+            self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
+            self.originalGraph.remove_old_curve()
+            self.equalizedGraph.remove_old_curve()
             self.choose_mode()
-            if self.current_mode_name=='Uniform Mode':
-                frequencies= Mode.compute_fft(self.original_signal.amplitude_data, self.original_signal.sampling_rate)[1]
-                max_freq=np.max(frequencies)
-                start,end=0,max_freq/10
-                for i in range (1, 11):
-                    self.original_signal.frquencies_ranges[i]=[start,end]
-                    start+=max_freq/10
-                    end+=max_freq/10
+
             self.update_plots()
 
     def update_plots(self):
+        self.set_uniform_frequency_ranges()
         self.originalGraph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
         self.equalizedGraph.reconstruct_signal_on_equalized_plot(self.equalized_signal.time_data, 
                                                                  self.equalized_signal.amplitude_data)
         Audiogram.plotAudiogram(self.equalized_signal.amplitude_data, 
                                 self.equalized_signal.sampling_rate, self.audiogramPlot)
-        self.frequency_domain = Mode.get_full_frequency_domain(self.equalized_signal.amplitude_data, 
-                                                               self.equalized_signal.sampling_rate)
+        
+        self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
         self.frequencyDomainPlot.remove_old_curve()
         self.frequencyDomainPlot.add_signal(self.frequency_domain, start = False, color = 'r')
 
@@ -97,6 +85,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
                                self.original_signal.sampling_rate, self.originalSpectrugram)
         Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
                                self.equalized_signal.sampling_rate, self.equalizedSpecrtugram)
+        self.update_audio_palyer()
 
     def save_signal(self):
         if self.current_mode_name == 'ECG Abnormalities':
@@ -147,14 +136,15 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
                 
     def apply_gain(self, slider_value, slider_index):
         self.slider_values[slider_index] = slider_value
-        self.equalized_signal.amplitude_data = Mode.apply_gain(self.original_signal.amplitude_data, self.slider_values,
-                                                               self.band_edges, self.original_signal.sampling_rate)
+        self.equalized_signal.amplitude_data, self.fft_of_signal = Mode.apply_gain(self.fft_of_signal,
+                                                         self.frequencies_of_signal, self.slider_values, self.band_edges)
         self.update_plots()
         
     def choose_mode(self):
         self.current_mode_name = self.modeComboBox.currentText()
         self.original_signal.mode = self.current_mode_name
         self.equalized_signal.mode = self.current_mode_name
+        self.equalized_signal=copy.deepcopy(self.original_signal)
         self.equalized_signal.frquencies_ranges = MySignal.available_frequencies[self.current_mode_name]
         self.band_edges = list(self.equalized_signal.frquencies_ranges.values())
         self.names = list(self.equalized_signal.frquencies_ranges.keys())
@@ -164,8 +154,6 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.sliders_layout=self.slider_creator(mode_name=self.current_mode_name)
         self.gridLayout_12.addLayout(self.sliders_layout,7,2,1,2)
         Graph.Graph.current_index = 0
-        self.original_signal= MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
-        self.equalized_signal=copy.deepcopy(self.original_signal)
         self.update_plots()
 
     def hide_show_spectrogram(self):
@@ -184,6 +172,26 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.frequencyDomainPlot.plot_widget.setVisible(False)
             self.audiogramPlot.setVisible(True)
 
+    def update_audio_palyer(self):
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
+          sf.write(temp.name, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
+        self.original_media_player =AudioPlayerWidget(audio_file=self.signal_file_path)
+        self.equlized_media_player =AudioPlayerWidget(audio_file=temp.name)
+        self.gridLayout_player.addWidget(self.original_media_player, 0,6,0,6)
+        self.gridLayout_player.addWidget(self.equlized_media_player, 20,6, 20,6)
+        self.original_media_player.set_other_players([self.equlized_media_player])
+        self.equlized_media_player.set_other_players([self.original_media_player])
+
+    def set_uniform_frequency_ranges(self):
+        if self.current_mode_name=='Uniform Mode':
+            frequencies= Mode.compute_fft(self.original_signal.amplitude_data, self.original_signal.sampling_rate)[1]
+            max_freq=np.max(frequencies)
+            start,end=0,max_freq/10
+            for i in range (1, 11):
+                self.original_signal.frquencies_ranges[i]=[start,end]
+                start+=max_freq/10
+                end+=max_freq/10
+
 def hide_layout(layout):
     for i in range(layout.count()):
         widget = layout.itemAt(i).widget()
@@ -195,8 +203,6 @@ def show_layout(layout):
         widget = layout.itemAt(i).widget()
         if widget is not None:
             widget.show()  # Show each widget
-
-
 
 app = QApplication(sys.argv)
 window = MainWindow()

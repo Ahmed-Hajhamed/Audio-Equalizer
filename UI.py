@@ -3,7 +3,7 @@ from Graph import Graph
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from MediaPlayer import RealTimeMediaPlayer
-
+from mixertest import AudioPlayerWidget
 class spectrogramPlot(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
@@ -17,8 +17,9 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1916, 961)
         MainWindow.setStyleSheet("")
-        self.original_media_player = RealTimeMediaPlayer()
-        self.equlized_media_player = RealTimeMediaPlayer()
+        # self.original_media_player = RealTimeMediaPlayer()
+        # self.equlized_media_player = RealTimeMediaPlayer()
+
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
@@ -101,8 +102,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_player = QtWidgets.QGridLayout()
         self.gridLayout_player.setObjectName("gridLayout_player")
-        self.gridLayout_player.addWidget(self.original_media_player, 0,6,0,6)
-        self.gridLayout_player.addWidget(self.equlized_media_player, 20,6, 20,6)
+
         self.gridLayout_player.setGeometry
         self.gridLayout_12.addLayout(self.gridLayout_player, 6,0,1,1)
 

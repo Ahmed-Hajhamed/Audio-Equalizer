@@ -1,27 +1,22 @@
-import sys
 import numpy as np
 import sounddevice as sd
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QPushButton, QSlider, QVBoxLayout, QWidget, QLabel, QHBoxLayout
+    QPushButton, QSlider, QVBoxLayout, QWidget, QLabel, QHBoxLayout
 )
-import librosa
 from PyQt5.QtCore import Qt, QTimer
-
 
 class RealTimeMediaPlayer(QWidget):
     def __init__(self, sr=44100, parent=None):
         super().__init__(parent)
 
-        # Sample rate
         self.sr = sr
         self.audio_buffer = np.array([], dtype=np.float32)
         self.playing = False
         self.stream = None
-        self.current_position = 0  # Current playback position in samples
+        self.current_position = 0 
         self.total_samples = 0
-        self.other_player = None  # Reference to the other player
+        self.other_player = None  
 
-        # UI elements
         self.play_button = QPushButton("Play")
         self.play_button.clicked.connect(self.toggle_playback)
         self.play_button.setFixedWidth(80)
@@ -32,7 +27,7 @@ class RealTimeMediaPlayer(QWidget):
         self.slider.setFixedWidth(80)
         self.time_label = QLabel("0:00 / 0:00")
         self.time_label.setFixedSize(20,50)
-        # Layout
+
         layout = QVBoxLayout()
         layout.addWidget(self.play_button)
         layout.addWidget(self.slider)
@@ -43,7 +38,6 @@ class RealTimeMediaPlayer(QWidget):
 
         self.setLayout(layout)
 
-        # Timer for updating the slider and label
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_ui)
         self.timer.start(100)
@@ -57,7 +51,6 @@ class RealTimeMediaPlayer(QWidget):
         if self.playing:
             self.pause_audio()
         else:
-            # Stop the other player if playing
             if self.other_player and self.other_player.playing:
                 self.other_player.pause_audio()
 
@@ -129,43 +122,3 @@ class RealTimeMediaPlayer(QWidget):
             self.time_label.setText(
                 f"{current_time // 60}:{current_time % 60:02} / {total_time // 60}:{total_time % 60:02}"
             )
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Real-Time Media Player")
-        self.setGeometry(100, 100, 500, 400)
-
-        # Create two media players
-        self.media_player1 = RealTimeMediaPlayer(sr=44100)
-        self.media_player2 = RealTimeMediaPlayer(sr=44100)
-
-        # Set them as each other's other player
-        self.media_player1.set_other_player(self.media_player2)
-        self.media_player2.set_other_player(self.media_player1)
-
-        # Load example audio for both players
-        audio1, sr1 = librosa.load('audio\\Passenger _ Let Her Go (Official Video) - Passenger (youtube).mp3', sr=44100)
-        audio2, sr2 = librosa.load('audio\\Passenger _ Let Her Go (Official Video) - Passenger (youtube).mp3', sr=44100)
-                        
-        self.media_player1.update_audio_data(audio1)
-        self.media_player2.update_audio_data(audio2)
-
-        # Layout for the players
-        central_widget = QWidget()
-        layout = QVBoxLayout(central_widget)
-        layout.addWidget(QLabel("Audio Player 1"))
-        layout.addWidget(self.media_player1)
-        layout.addWidget(QLabel("Audio Player 2"))
-        layout.addWidget(self.media_player2)
-
-        self.setCentralWidget(central_widget)
-
-
-# Run the application
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())

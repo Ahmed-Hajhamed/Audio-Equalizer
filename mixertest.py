@@ -4,12 +4,13 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import QUrl, Qt, QTimer
 
 class AudioPlayerWidget(QWidget):
-    def __init__(self, audio_file, parent=None):
+    def __init__(self, audio_file = None, parent=None):
         super().__init__(parent)
 
         # Create a media player object
         self.media_player = QMediaPlayer()
-        self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(audio_file)))
+        self.audio_file = audio_file
+        self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(self.audio_file)))
 
         # Create UI elements
         play_button = QPushButton("Play")
@@ -102,36 +103,36 @@ class AudioPlayerWidget(QWidget):
         self.media_player.play()
 
 
-# Main window class to add the AudioPlayerWidget
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Main Window with Audio Player")
-        self.setGeometry(100, 100, 500, 300)
+# # Main window class to add the AudioPlayerWidget
+# class MainWindow(QMainWindow):
+#     def __init__(self):
+#         super().__init__()
+#         self.setWindowTitle("Main Window with Audio Player")
+#         self.setGeometry(100, 100, 500, 300)
 
-        # Create two instances of the audio player widget
-        audio_player_1 = AudioPlayerWidget("C:\\Users\\VICTUS\\Downloads\\file_example_WAV_1MG.wav")  # Replace with actual file
-        audio_player_2 = AudioPlayerWidget("C:\\Users\\VICTUS\\Downloads\\Passenger _ Let Her Go (Official Video) - Passenger (youtube).mp3")  # Replace with actual file
+#         # Create two instances of the audio player widget
+#         audio_player_1 = AudioPlayerWidget(audio_file="C:\\Users\\VICTUS\\Downloads\\file_example_WAV_1MG.wav")  # Replace with actual file
+#         audio_player_2 = AudioPlayerWidget(audio_file="C:\\Users\\VICTUS\\Downloads\\Passenger _ Let Her Go (Official Video) - Passenger (youtube).mp3")  # Replace with actual file
 
-        # Set the other players for each player
-        audio_player_1.set_other_players([audio_player_2])
-        audio_player_2.set_other_players([audio_player_1])
+#         # Set the other players for each player
+#         audio_player_1.set_other_players([audio_player_2])
+#         audio_player_2.set_other_players([audio_player_1])
 
-        # Set up the layout to hold both audio players
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(audio_player_1)
-        main_layout.addWidget(audio_player_2)
+#         # Set up the layout to hold both audio players
+#         main_layout = QVBoxLayout()
+#         main_layout.addWidget(audio_player_1)
+#         main_layout.addWidget(audio_player_2)
 
-        # Create a central widget to hold the layout
-        central_widget = QWidget()
-        central_widget.setLayout(main_layout)
+#         # Create a central widget to hold the layout
+#         central_widget = QWidget()
+#         central_widget.setLayout(main_layout)
 
-        # Set the central widget of the window
-        self.setCentralWidget(central_widget)
+#         # Set the central widget of the window
+#         self.setCentralWidget(central_widget)
 
 
-# Run the application
-app = QApplication(sys.argv)
-window = MainWindow()
-window.show()
-sys.exit(app.exec_())
+# # Run the application
+# app = QApplication(sys.argv)
+# window = MainWindow()
+# window.show()
+# sys.exit(app.exec_())
