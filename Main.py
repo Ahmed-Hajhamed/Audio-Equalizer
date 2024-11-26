@@ -63,15 +63,19 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
                                                                                self.equalized_signal.sampling_rate)
             self.band_edges = list(self.original_signal.frquencies_ranges.values())
             self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
+            
+            Mode.plot_spectrogram(self.original_signal.amplitude_data,
+                               self.original_signal.sampling_rate, self.originalSpectrugram)
+            
             self.originalGraph.remove_old_curve()
             self.equalizedGraph.remove_old_curve()
             self.choose_mode()
-
+            self.originalGraph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
             self.update_plots()
 
     def update_plots(self):
         self.set_uniform_frequency_ranges()
-        self.originalGraph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
+        # self.originalGraph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
         self.equalizedGraph.reconstruct_signal_on_equalized_plot(self.equalized_signal.time_data, 
                                                                  self.equalized_signal.amplitude_data)
         Audiogram.plotAudiogram(self.equalized_signal.amplitude_data, 
@@ -81,8 +85,8 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.frequencyDomainPlot.remove_old_curve()
         self.frequencyDomainPlot.add_signal(self.frequency_domain, start = False, color = 'r')
 
-        Mode.plot_spectrogram(self.original_signal.amplitude_data,
-                               self.original_signal.sampling_rate, self.originalSpectrugram)
+        # Mode.plot_spectrogram(self.original_signal.amplitude_data,
+        #                        self.original_signal.sampling_rate, self.originalSpectrugram)
         Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
                                self.equalized_signal.sampling_rate, self.equalizedSpecrtugram)
         self.update_audio_palyer()

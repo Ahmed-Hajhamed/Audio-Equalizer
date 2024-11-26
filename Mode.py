@@ -28,12 +28,12 @@ def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):
 def reconstruct_signal(modified_fft):
     reconstructed_signal = np.fft.ifft(modified_fft).real
     return reconstructed_signal
-                   
+
 def plot_spectrogram(signal, sampling_rate, canvas):
     """
     Plot spectrogram using Matplotlib.
     """
-    f, t, Sxx = spectrogram(signal, fs= sampling_rate, nperseg=128, noverlap=64)
+    sampled_frequencies, segment_times, Sxx = spectrogram(signal, fs= sampling_rate, nperseg=128, noverlap=64)
     Sxx_db = 10 * np.log10(Sxx + 1e-10) 
 
     if canvas.no_label:
@@ -41,7 +41,7 @@ def plot_spectrogram(signal, sampling_rate, canvas):
         canvas.vmin, canvas.vmax = np.min(Sxx_db), np.max(Sxx_db)
 
     canvas.axes.clear()
-    cax = canvas.axes.pcolormesh(t, f, Sxx_db, shading='gouraud', cmap='plasma', vmin=canvas.vmin, vmax=canvas.vmax)
+    cax = canvas.axes.pcolormesh(segment_times, sampled_frequencies, Sxx_db, shading='gouraud', cmap='plasma', vmin=canvas.vmin, vmax=canvas.vmax)
     canvas.axes.set_xlabel("Time (s)")
     canvas.axes.set_ylabel("Frequency (Hz)")
     canvas.axes.set_title("Spectrogram")
