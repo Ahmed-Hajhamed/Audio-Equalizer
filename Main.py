@@ -85,8 +85,8 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.frequencyDomainPlot.remove_old_curve()
         self.frequencyDomainPlot.add_signal(self.frequency_domain, start = False, color = 'r')
 
-        # Mode.plot_spectrogram(self.original_signal.amplitude_data,
-        #                        self.original_signal.sampling_rate, self.originalSpectrugram)
+        Mode.plot_spectrogram(self.original_signal.amplitude_data,
+                               self.original_signal.sampling_rate, self.originalSpectrugram)
         Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
                                self.equalized_signal.sampling_rate, self.equalizedSpecrtugram)
         self.update_audio_palyer()
