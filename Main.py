@@ -49,6 +49,8 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.switch_audiogram_linear_scale()
         self.original_media_player.set_other_players([self.equlized_media_player])
         self.equlized_media_player.set_other_players([self.original_media_player])
+        self.originalGraph.plot_widget.setXLink(self.equalizedGraph.plot_widget)
+        self.originalGraph.plot_widget.setYLink(self.equalizedGraph.plot_widget)
 
     def load_signal(self):
         if self.original_signal is None:

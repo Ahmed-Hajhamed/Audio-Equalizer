@@ -14,7 +14,7 @@ class Graph():
     current_index = 0
     current_index_increment = 10
     timer = QTimer()
-    timer.setInterval(100)  # Update every 100ms
+    timer.setInterval(100)  
 
     def __init__(self, centralWidget, is_frequency_domain=False):
         super().__init__()

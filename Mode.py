@@ -11,6 +11,13 @@ def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
     positive_freqs = frequencies[:len(frequencies) // 2]
     magnitude=np.abs(fft_result)
     positive_magnitude = magnitude[:len(magnitude) // 2]
+
+    max_magnitude = np.max(positive_magnitude)
+    magnitude_threshold = 0.01 * max_magnitude
+    significant_indices = np.where(positive_magnitude > magnitude_threshold)
+    positive_freqs = positive_freqs[significant_indices]
+    positive_magnitude = positive_magnitude[significant_indices]
+    
     return  [positive_freqs, positive_magnitude]
 
 def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):

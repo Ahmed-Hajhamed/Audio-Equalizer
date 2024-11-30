@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtWidgets
-from Graph import Graph
+import Graph
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
@@ -54,7 +54,7 @@ class Ui_MainWindow(object):
         self.gridLayout_6.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.gridLayout_6.setObjectName("gridLayout_6")
 
-        self.originalGraph = Graph(self.centralwidget)
+        self.originalGraph = Graph.Graph(self.centralwidget)
         # self.originalGraph.plot_widget.setMaximumSize(QtCore.QSize(600, 400))
         self.originalGraph.plot_widget.setObjectName("originalGraph")
 
@@ -124,7 +124,7 @@ class Ui_MainWindow(object):
         self.gridLayout_5 = QtWidgets.QGridLayout()
         self.gridLayout_5.setObjectName("gridLayout_5")
 
-        self.equalizedGraph = Graph(self.centralwidget)
+        self.equalizedGraph = Graph.Graph(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -171,13 +171,13 @@ class Ui_MainWindow(object):
         self.speedUpButton = QtWidgets.QPushButton(self.centralwidget)
         self.speedUpButton.setMaximumSize(QtCore.QSize(60, 16777215))
         self.speedUpButton.setObjectName("speedUpButton")
+        self.gridLayout_8.addWidget(self.speedUpButton, 1, 6, 1, 1)
 
-        self.gridLayout_8.addWidget(self.speedUpButton, 1, 5, 1, 1)
         self.speedDownButton = QtWidgets.QPushButton(self.centralwidget)
         self.speedDownButton.setMaximumSize(QtCore.QSize(60, 16777215))
         self.speedDownButton.setObjectName("speedDownButton")
+        self.gridLayout_8.addWidget(self.speedDownButton, 1, 5, 1, 1)
 
-        self.gridLayout_8.addWidget(self.speedDownButton, 1, 6, 1, 1)
         self.resetButton = QtWidgets.QPushButton(self.centralwidget)
         self.resetButton.setMaximumSize(QtCore.QSize(60, 16777215))
         self.resetButton.setObjectName("resetButton")
@@ -230,7 +230,7 @@ class Ui_MainWindow(object):
         self.gridLayout_18 = QtWidgets.QGridLayout()
         self.gridLayout_18.setObjectName("gridLayout_18")
 
-        self.frequencyDomainPlot = Graph(self.centralwidget, is_frequency_domain=True)
+        self.frequencyDomainPlot = Graph.Graph(self.centralwidget, is_frequency_domain=True)
         self.frequencyDomainPlot.plot_widget.setFixedSize(QtCore.QSize(550, 370))
         self.frequencyDomainPlot.plot_widget.setObjectName("frequencyDomainPlot")
         self.gridLayout_18.addWidget(self.frequencyDomainPlot.plot_widget, 1, 0, 1, 1)
@@ -284,12 +284,12 @@ class Ui_MainWindow(object):
         self.equalizedFileLabel.setText(_translate("MainWindow", "Equalized File"))
         self.saveButton.setText(_translate("MainWindow", "Save"))
         self.loadButton.setText(_translate("MainWindow", "Load"))
-        self.speedUpButton.setText(_translate("MainWindow", "Speed Up"))
-        self.speedDownButton.setText(_translate("MainWindow", "Speed Down"))
-        self.resetButton.setText(_translate("MainWindow", "Reset"))
-        self.zoomInButton.setText(_translate("MainWindow", "Zoom In"))
-        self.zoomOutButton.setText(_translate("MainWindow", "Zoom Out"))
-        self.playButton.setText(_translate("MainWindow", "Play"))
+        Graph.set_icon(self.resetButton, "icons\icons8-reset-96.png")
+        Graph.set_icon(self.speedUpButton, "icons\speed_up.png")
+        Graph.set_icon(self.speedDownButton, "icons\speed_down.png")
+        Graph.set_icon(self.zoomInButton, "icons\zoom in.png")
+        Graph.set_icon(self.zoomOutButton, "icons\zoom out.png")
+        Graph.set_icon(self.playButton, "icons\pause.png")
         self.linearScaleRadioButton.setText(_translate("MainWindow", "Linear Scale"))
         self.audiogramRadioButton.setText(_translate("MainWindow", "Audiogram"))
 
