@@ -139,16 +139,21 @@ class Ui_MainWindow(object):
         self.gridLayout_3 = QtWidgets.QGridLayout()
         self.gridLayout_3.setObjectName("gridLayout_3")
 
+        self.signalNmaeLabel = QtWidgets.QLabel(self.centralwidget)
+        self.signalNmaeLabel.setMaximumSize(QtCore.QSize(1000, 50))
+        self.signalNmaeLabel.setObjectName("equalizedFileLabel")
+        self.gridLayout_3.addWidget(self.signalNmaeLabel, 0, 0, 1, 1)
+
         self.saveButton = QtWidgets.QPushButton(self.centralwidget)
         self.saveButton.setMaximumSize(QtCore.QSize(100, 50))
         self.saveButton.setObjectName("saveButton")
+        self.gridLayout_3.addWidget(self.saveButton, 2, 0, 1, 1)
 
-        self.gridLayout_3.addWidget(self.saveButton, 1, 0, 1, 1)
         self.loadButton = QtWidgets.QPushButton(self.centralwidget)
         self.loadButton.setMaximumSize(QtCore.QSize(100, 50))
         self.loadButton.setObjectName("loadButton")
+        self.gridLayout_3.addWidget(self.loadButton, 1, 0, 1, 1)
 
-        self.gridLayout_3.addWidget(self.loadButton, 0, 0, 1, 1)
         self.gridLayout_12.addLayout(self.gridLayout_3, 0, 0, 2, 1)
         self.gridLayout_21 = QtWidgets.QGridLayout()
         self.gridLayout_21.setObjectName("gridLayout_21")
@@ -226,20 +231,20 @@ class Ui_MainWindow(object):
         self.gridLayout_18.setObjectName("gridLayout_18")
 
         self.frequencyDomainPlot = Graph(self.centralwidget, is_frequency_domain=True)
-        self.frequencyDomainPlot.plot_widget.setMaximumSize(QtCore.QSize(550, 370))
+        self.frequencyDomainPlot.plot_widget.setFixedSize(QtCore.QSize(550, 370))
         self.frequencyDomainPlot.plot_widget.setObjectName("frequencyDomainPlot")
-        self.gridLayout_18.addWidget(self.frequencyDomainPlot.plot_widget, 2, 0, 1, 1)
+        self.gridLayout_18.addWidget(self.frequencyDomainPlot.plot_widget, 1, 0, 1, 1)
 
         self.audiogramPlot = spectrogramPlot(self.centralwidget)
-        self.audiogramPlot.setMaximumSize(QtCore.QSize(550, 370))
+        self.audiogramPlot.setFixedSize(QtCore.QSize(550, 370))
         self.audiogramPlot.setObjectName("frequencyDomainPlot")
-        self.gridLayout_18.addWidget(self.audiogramPlot, 2, 0, 1, 1)
+        self.gridLayout_18.addWidget(self.audiogramPlot, 1, 0, 1, 1)
 
         self.frequencyDomainLabel = QtWidgets.QLabel(self.centralwidget)
         self.frequencyDomainLabel.setMaximumSize(QtCore.QSize(200, 50))
         self.frequencyDomainLabel.setObjectName("frequencyDomainLabel")
 
-        self.gridLayout_18.addWidget(self.frequencyDomainLabel, 1, 0, 1, 1)
+        self.gridLayout_18.addWidget(self.frequencyDomainLabel, 0, 0, 1, 1)
         self.gridLayout_12.addLayout(self.gridLayout_18, 1, 5, 6, 1)
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
@@ -290,4 +295,4 @@ class Ui_MainWindow(object):
 
         self.frequency_label.setText(_translate("MainWindow", "Frequency Scale:"))
         self.originalSpectrugramLabel.setText(_translate("MainWindow", "Original Spectrugram"))
-        self.frequencyDomainLabel.setText(_translate("MainWindow", "Frequency Domain"))
+        self.frequencyDomainLabel.setText(_translate("MainWindow", "Frequency Domain:"))

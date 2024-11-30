@@ -59,6 +59,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.signal_file_path=file_path
             self.original_signal= MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
             self.equalized_signal=copy.deepcopy(self.original_signal)
+            self.signalNmaeLabel.setText(self.original_signal.signal_name)
             self.fft_of_signal, self.frequencies_of_signal = Mode.compute_fft(self.equalized_signal.amplitude_data,
                                                                                self.equalized_signal.sampling_rate)
             self.band_edges = list(self.original_signal.frquencies_ranges.values())
@@ -172,9 +173,11 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         if self.linearScaleRadioButton.isChecked():
             self.frequencyDomainPlot.plot_widget.setVisible(True)
             self.audiogramPlot.setVisible(False)
+            self.frequencyDomainLabel.setText("Linear Scale Frequency")
         elif self.audiogramRadioButton.isChecked():
             self.frequencyDomainPlot.plot_widget.setVisible(False)
             self.audiogramPlot.setVisible(True)
+            self.frequencyDomainLabel.setText("Audiogram Scale")
 
     def update_audio_palyer(self):
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
