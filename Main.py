@@ -87,11 +87,11 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
         self.frequencyDomainPlot.remove_old_curve()
         self.frequencyDomainPlot.add_signal(self.frequency_domain, start = False, color = 'r')
-
-        Mode.plot_spectrogram(self.original_signal.amplitude_data,
-                               self.original_signal.sampling_rate, self.originalSpectrugram)
-        Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
-                               self.equalized_signal.sampling_rate, self.equalizedSpecrtugram)
+        if self.spectrugramCheckBox.isChecked():
+            Mode.plot_spectrogram(self.original_signal.amplitude_data,
+                                self.original_signal.sampling_rate, self.originalSpectrugram)
+            Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
+                                self.equalized_signal.sampling_rate, self.equalizedSpecrtugram)
         self.update_audio_palyer()
 
     def save_signal(self):
@@ -170,6 +170,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
                 show_layout(layout)
             else:
                 hide_layout(layout)
+        self.update_plots()
 
     def switch_audiogram_linear_scale(self):
         if self.linearScaleRadioButton.isChecked():
