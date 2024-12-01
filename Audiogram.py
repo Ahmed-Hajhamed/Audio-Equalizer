@@ -16,7 +16,7 @@ def fourierTansformWave(audio=[], sampfreq=440010):
 
     return fourier_transform_dB , fourier_transform_freq
 
-def modify_wave (self, magnitude  , freq , start_index , end_index , new_magnitude  ) : 
+def modify_wave (magnitude  , freq , start_index , end_index , new_magnitude  ) : 
     for i in range ( len(magnitude)):
         if  freq[i] >= start_index:
             if freq[i] < end_index:
