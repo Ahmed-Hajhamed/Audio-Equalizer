@@ -188,7 +188,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.original_media_player =AudioPlayerWidget(audio_file=self.signal_file_path)
         self.equlized_media_player =AudioPlayerWidget(audio_file=temp.name)
         self.gridLayout_player.addWidget(self.original_media_player, 0,6,0,6)
-        self.gridLayout_player.addWidget(self.equlized_media_player, 20,6, 20,6)
+        self.gridLayout_player2.addWidget(self.equlized_media_player, 0,6, 0,6)
         self.original_media_player.set_other_players([self.equlized_media_player])
         self.equlized_media_player.set_other_players([self.original_media_player])
 

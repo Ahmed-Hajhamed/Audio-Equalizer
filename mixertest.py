@@ -25,7 +25,7 @@ class AudioPlayerWidget(QWidget):
         self.slider.sliderPressed.connect(self.pause_audio_during_seek)
         self.slider.sliderReleased.connect(self.seek_position)
 
-        self.time_label = QLabel("0:00")
+        # self.time_label = QLabel("")
 
         self.media_player.positionChanged.connect(self.update_slider)
         self.media_player.durationChanged.connect(self.update_duration)
@@ -37,7 +37,7 @@ class AudioPlayerWidget(QWidget):
 
         slider_layout = QVBoxLayout()
         slider_layout.addWidget(self.slider)
-        slider_layout.addWidget(self.time_label)
+        # slider_layout.addWidget(self.time_label)
 
         main_layout = QVBoxLayout()
         main_layout.addLayout(control_layout)
@@ -45,9 +45,9 @@ class AudioPlayerWidget(QWidget):
 
         self.setLayout(main_layout)
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_time_label)
-        self.timer.start(500)
+        # self.timer = QTimer()
+        # self.timer.timeout.connect(self.update_time_label)
+        # self.timer.start(500)
 
         self.is_seeking = False
 
@@ -60,7 +60,7 @@ class AudioPlayerWidget(QWidget):
     def stop_and_reset(self):
         self.media_player.stop()
         self.slider.setValue(0)
-        self.time_label.setText("0:00")
+        # self.time_label.setText("0:00")
 
     def pause_audio_during_seek(self):
         self.is_seeking = True
@@ -75,14 +75,14 @@ class AudioPlayerWidget(QWidget):
     def update_slider(self, position):
         if not self.is_seeking and self.media_player.duration() > 0:
             self.slider.setValue(position)
-        self.update_time_label()
+        # self.update_time_label()
 
     def update_duration(self, duration):
         self.slider.setRange(0, duration)
 
-    def update_time_label(self):
-        position_in_seconds = self.media_player.position() // 1000
-        self.time_label.setText(f"{position_in_seconds // 60}:{position_in_seconds % 60:02}")
+    # def update_time_label(self):
+    #     position_in_seconds = self.media_player.position() // 1000
+    #     self.time_label.setText(f"{position_in_seconds // 60}:{position_in_seconds % 60:02}")
 
     def play_audio(self):
         for player in self.other_players:

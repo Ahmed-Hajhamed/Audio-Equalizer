@@ -105,6 +105,12 @@ class Ui_MainWindow(object):
         self.gridLayout_player.setGeometry
         self.gridLayout_12.addLayout(self.gridLayout_player, 6,0,1,1)
 
+        self.gridLayout_player2 = QtWidgets.QGridLayout()
+        self.gridLayout_player2.setObjectName("gridLayout_player")
+
+        self.gridLayout_player2.setGeometry
+        self.gridLayout_12.addLayout(self.gridLayout_player2, 7,0,1,1)
+
         self.gridLayout_16 = QtWidgets.QGridLayout()
         self.gridLayout_16.setObjectName("gridLayout_16")
 
