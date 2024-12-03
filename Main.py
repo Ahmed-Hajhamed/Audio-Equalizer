@@ -30,7 +30,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.fft_of_signal = None
         self.frequencies_of_signal = None
         self.linearScaleRadioButton.setChecked(True)
-        self.spectrugramCheckBox.setChecked(True)
+        self.spectrugramCheckBox.setChecked(False)
         self.spectrugramCheckBox.stateChanged.connect(self.hide_show_spectrogram)
         self.loadButton.clicked.connect(self.load_signal)
         self.saveButton.clicked.connect(self.save_signal)
@@ -47,8 +47,9 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.audiogramRadioButton.toggled.connect(self.switch_audiogram_linear_scale)
         self.load_signal()
         self.switch_audiogram_linear_scale()
-        self.original_media_player.set_other_players([self.equlized_media_player])
-        self.equlized_media_player.set_other_players([self.original_media_player])
+        # self.update_audio_palyer()
+        # self.original_media_player.set_other_players([self.equlized_media_player])
+        # self.equlized_media_player.set_other_players([self.original_media_player])
         self.originalGraph.plot_widget.setXLink(self.equalizedGraph.plot_widget)
         self.originalGraph.plot_widget.setYLink(self.equalizedGraph.plot_widget)
 
@@ -93,7 +94,6 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
                                 self.equalized_signal.sampling_rate, self.equalizedSpecrtugram)
         self.update_audio_palyer()
-
     def save_signal(self):
         if self.current_mode_name == 'ECG Abnormalities':
             options = QFileDialog.Options()
@@ -127,6 +127,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             slider.valueChanged.connect(lambda value, idx=i: self.apply_gain(value, idx))
             label = QLabel(str(self.names[i]))
             label.setObjectName("slider_1_label")
+            label.setFixedHeight(30)
             band_layout.addWidget(label, 3, i, 1, 1)
             band_layout.addWidget(slider, 2, i, 1, 1)
         return band_layout
@@ -145,7 +146,10 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.slider_values[slider_index] = slider_value
         self.equalized_signal.amplitude_data, self.fft_of_signal = Mode.apply_gain(self.fft_of_signal,
                                                          self.frequencies_of_signal, self.slider_values, self.band_edges)
+        self.equalized_signal.time_data = np.linspace(0, len(self.equalized_signal.amplitude_data)/ self.equalized_signal.sampling_rate,
+                                                       len(self.equalized_signal.amplitude_data))
         self.update_plots()
+        # self.update_audio_palyer()
         
     def choose_mode(self):
         self.current_mode_name = self.modeComboBox.currentText()
@@ -162,14 +166,16 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.gridLayout_12.addLayout(self.sliders_layout,7,2,1,2)
         Graph.Graph.current_index = 0
         self.update_plots()
+        # self.update_audio_palyer()
 
     def hide_show_spectrogram(self):
-        layouts = [self.gridLayout, self.gridLayout_2, self.gridLayout_20, self.gridLayout_14]
-        for layout in layouts:
+        widgets = [self.gridLayout, self.gridLayout_2, self.gridLayout_20, self.gridLayout_14]
+        for widget in widgets:
             if self.spectrugramCheckBox.isChecked():
-                show_layout(layout)
+                show_layout(widget)
             else:
-                hide_layout(layout)
+                hide_layout(widget)
+                self.originalSpectrugram.setVisible(False)
         self.update_plots()
 
     def switch_audiogram_linear_scale(self):
@@ -216,6 +222,6 @@ def show_layout(layout):
 
 app = QApplication(sys.argv)
 window = MainWindow()
-apply_stylesheet(app, theme='dark_teal.xml')
+apply_stylesheet(app, theme='dark_cyan.xml')
 window.show()
 sys.exit(app.exec_())

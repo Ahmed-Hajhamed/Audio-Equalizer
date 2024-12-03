@@ -16,8 +16,6 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1916, 961)
         MainWindow.setStyleSheet("")
-        # self.original_media_player = RealTimeMediaPlayer()
-        # self.equlized_media_player = RealTimeMediaPlayer()
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -36,8 +34,8 @@ class Ui_MainWindow(object):
         self.equalizedSpecrtugram = spectrogramPlot(self.centralwidget)
         self.equalizedSpecrtugram.setMaximumSize(QtCore.QSize(400, 400))
         self.equalizedSpecrtugram.setObjectName("equalizedSpecrtugram")
+        # self.gridLayout_2.addWidget(self.equalizedSpecrtugram, 0, 0, 1, 1)
 
-        self.gridLayout_2.addWidget(self.equalizedSpecrtugram, 0, 0, 1, 1)
         self.gridLayout_12.addLayout(self.gridLayout_2, 5, 3, 2, 1)
         self.gridLayout_15 = QtWidgets.QGridLayout()
         self.gridLayout_15.setObjectName("gridLayout_15")
@@ -45,11 +43,9 @@ class Ui_MainWindow(object):
         self.originalFileLabel = QtWidgets.QLabel(self.centralwidget)
         self.originalFileLabel.setMaximumSize(QtCore.QSize(16777215, 50))
         self.originalFileLabel.setObjectName("originalFileLabel")
-
         self.gridLayout_15.addWidget(self.originalFileLabel, 0, 0, 1, 1)
         self.gridLayout_12.addLayout(self.gridLayout_15, 0, 2, 1, 1)
-        self.gridLayout_4 = QtWidgets.QGridLayout()
-        self.gridLayout_4.setObjectName("gridLayout_4")
+
         self.gridLayout_6 = QtWidgets.QGridLayout()
         self.gridLayout_6.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.gridLayout_6.setObjectName("gridLayout_6")
@@ -59,16 +55,15 @@ class Ui_MainWindow(object):
         self.originalGraph.plot_widget.setObjectName("originalGraph")
 
         self.gridLayout_6.addWidget(self.originalGraph.plot_widget, 0, 0, 1, 1)
-        self.gridLayout_4.addLayout(self.gridLayout_6, 0, 0, 1, 1)
-        self.gridLayout_12.addLayout(self.gridLayout_4, 1, 2, 2, 1)
+        self.gridLayout_12.addLayout(self.gridLayout_6, 1, 2, 2, 1)
         self.gridLayout_20 = QtWidgets.QGridLayout()
         self.gridLayout_20.setObjectName("gridLayout_20")
 
         self.equalizedSpectrugramLabel = QtWidgets.QLabel(self.centralwidget)
         self.equalizedSpectrugramLabel.setMaximumSize(QtCore.QSize(16777215, 50))
         self.equalizedSpectrugramLabel.setObjectName("equalizedSpectrugramLabel")
+        # self.gridLayout_20.addWidget(self.equalizedSpectrugramLabel, 0, 0, 1, 1)
 
-        self.gridLayout_20.addWidget(self.equalizedSpectrugramLabel, 0, 0, 1, 1)
         self.gridLayout_12.addLayout(self.gridLayout_20, 4, 3, 1, 1)
         self.gridLayout_10 = QtWidgets.QGridLayout()
         self.gridLayout_10.setObjectName("gridLayout_10")
@@ -119,7 +114,7 @@ class Ui_MainWindow(object):
         self.equalizedFileLabel.setObjectName("equalizedFileLabel")
 
         self.gridLayout_16.addWidget(self.equalizedFileLabel, 0, 0, 1, 1)
-        self.gridLayout_12.addLayout(self.gridLayout_16, 4, 2, 1, 1)
+        self.gridLayout_12.addLayout(self.gridLayout_16, 3, 2, 2, 1)
 
         self.line_2 = QtWidgets.QFrame(self.centralwidget)
         self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
@@ -141,7 +136,7 @@ class Ui_MainWindow(object):
         self.equalizedGraph.plot_widget.setObjectName("equalizedGraph")
 
         self.gridLayout_5.addWidget(self.equalizedGraph.plot_widget, 0, 0, 1, 1)
-        self.gridLayout_12.addLayout(self.gridLayout_5, 5, 2, 2, 1)
+        self.gridLayout_12.addLayout(self.gridLayout_5, 4, 2, 2, 1)
         self.gridLayout_3 = QtWidgets.QGridLayout()
         self.gridLayout_3.setObjectName("gridLayout_3")
 
@@ -227,43 +222,56 @@ class Ui_MainWindow(object):
         self.gridLayout_14 = QtWidgets.QGridLayout()
         self.gridLayout_14.setObjectName("gridLayout_14")
 
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout.setObjectName("gridLayout")
+
+        self.originalSpectrugram = spectrogramPlot(self.centralwidget)
+        self.originalSpectrugram.setMaximumSize(QtCore.QSize(400, 450))
+        self.originalSpectrugram.setObjectName("originalSpectrugram")
+        # self.gridLayout.addWidget(self.originalSpectrugram, 0, 0, 1, 1)
+
         self.originalSpectrugramLabel = QtWidgets.QLabel(self.centralwidget)
         self.originalSpectrugramLabel.setMaximumSize(QtCore.QSize(16777215, 50))
         self.originalSpectrugramLabel.setObjectName("originalSpectrugramLabel")
+        # self.gridLayout_14.addWidget(self.originalSpectrugramLabel, 0, 0, 1, 1)
 
-        self.gridLayout_14.addWidget(self.originalSpectrugramLabel, 0, 0, 1, 1)
         self.gridLayout_12.addLayout(self.gridLayout_14, 0, 3, 1, 1)
         self.gridLayout_18 = QtWidgets.QGridLayout()
         self.gridLayout_18.setObjectName("gridLayout_18")
 
         self.frequencyDomainPlot = Graph.Graph(self.centralwidget, is_frequency_domain=True)
-        self.frequencyDomainPlot.plot_widget.setFixedSize(QtCore.QSize(550, 370))
+        # self.frequencyDomainPlot.plot_widget.setFixedSize(QtCore.QSize(550, 370))
         self.frequencyDomainPlot.plot_widget.setObjectName("frequencyDomainPlot")
         self.gridLayout_18.addWidget(self.frequencyDomainPlot.plot_widget, 1, 0, 1, 1)
 
         self.audiogramPlot = spectrogramPlot(self.centralwidget)
-        self.audiogramPlot.setFixedSize(QtCore.QSize(550, 370))
+        # self.audiogramPlot.setFixedSize(QtCore.QSize(550, 370))
         self.audiogramPlot.setObjectName("frequencyDomainPlot")
         self.gridLayout_18.addWidget(self.audiogramPlot, 1, 0, 1, 1)
 
         self.frequencyDomainLabel = QtWidgets.QLabel(self.centralwidget)
         self.frequencyDomainLabel.setMaximumSize(QtCore.QSize(200, 50))
         self.frequencyDomainLabel.setObjectName("frequencyDomainLabel")
-
         self.gridLayout_18.addWidget(self.frequencyDomainLabel, 0, 0, 1, 1)
-        self.gridLayout_12.addLayout(self.gridLayout_18, 1, 5, 6, 1)
-        self.gridLayout = QtWidgets.QGridLayout()
-        self.gridLayout.setObjectName("gridLayout")
+
+        self.gridLayout.addWidget(self.originalSpectrugramLabel, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.originalSpectrugram, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.equalizedSpectrugramLabel, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.equalizedSpecrtugram, 3, 0, 1, 1)
+
+        self.originalGraph.plot_widget.setFixedHeight(200)
+        self.equalizedGraph.plot_widget.setFixedHeight(200)
+        self.frequencyDomainPlot.plot_widget.setFixedHeight(200)
+
+        self.gridLayout_12.addLayout(self.gridLayout, 1, 5, 6, 1)
+
+        self.gridLayout_12.addLayout(self.gridLayout_18, 5, 2, 2, 1)
 
         self.gridLayout_7 = QtWidgets.QGridLayout()
         self.gridLayout_7.setObjectName("gridLayout_7")
-
-        self.originalSpectrugram = spectrogramPlot(self.centralwidget)
-        self.originalSpectrugram.setMaximumSize(QtCore.QSize(400, 450))
-        self.originalSpectrugram.setObjectName("originalSpectrugram")
-
-        self.gridLayout.addWidget(self.originalSpectrugram, 0, 0, 1, 1)
-        self.gridLayout_12.addLayout(self.gridLayout, 1, 3, 3, 1)
+        self.originalFileLabel.setFixedHeight(20)
+        self.equalizedFileLabel.setFixedHeight(20)
+        self.frequencyDomainLabel.setFixedHeight(20)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1916, 26))

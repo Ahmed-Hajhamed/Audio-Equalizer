@@ -4,25 +4,22 @@ from scipy.signal import spectrogram
 def compute_fft(signal_amplitudes, sampling_rate):
     fft_result =   np.fft.fft(signal_amplitudes)
     frequencies =   np.fft.fftfreq(len(signal_amplitudes), d=1 /sampling_rate)
-    magnitude = np.abs(fft_result)
-    magnitude_threshold_ratio = 0.01
-    # Determine threshold for significant magnitudes
-    max_magnitude = np.max(magnitude)
-    magnitude_threshold = magnitude_threshold_ratio * max_magnitude
-
-    # Filter significant frequencies and FFT results
-    significant_indices = np.where(magnitude > magnitude_threshold)
-    significant_fft = fft_result[significant_indices]
-    significant_frequencies = frequencies[significant_indices]
-
-    return significant_fft, significant_frequencies
+    return fft_result, frequencies
 
 def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
-    fft_result, frequencies = fft_of_signal, frequencies_of_signal
-    positive_freqs = frequencies[:len(frequencies) // 2]
-    magnitude=np.abs(fft_result)
+    positive_freqs = frequencies_of_signal[:len(frequencies_of_signal) // 2]
+    magnitude = np.abs(fft_of_signal)
     positive_magnitude = magnitude[:len(magnitude) // 2]
-    return  [positive_freqs, positive_magnitude]
+
+    magnitude_threshold_ratio = 0.005
+    max_magnitude = np.max(positive_magnitude)
+    magnitude_threshold = magnitude_threshold_ratio * max_magnitude
+
+    significant_indices = np.where(positive_magnitude > magnitude_threshold)
+    positive_freqs = positive_freqs[significant_indices]
+    positive_magnitude = positive_magnitude[significant_indices]
+    
+    return positive_freqs, positive_magnitude
 
 def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):
     fft_result, frequencies = fft_of_signal, frequencies_of_signal

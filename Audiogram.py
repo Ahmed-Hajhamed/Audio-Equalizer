@@ -16,7 +16,7 @@ def fourierTansformWave(audio=[], sampfreq=440010):
 
     return fourier_transform_dB , fourier_transform_freq
 
-def modify_wave (magnitude  , freq , start_index , end_index , new_magnitude  ) : 
+def modify_wave (self, magnitude  , freq , start_index , end_index , new_magnitude  ) : 
     for i in range ( len(magnitude)):
         if  freq[i] >= start_index:
             if freq[i] < end_index:
@@ -24,32 +24,39 @@ def modify_wave (magnitude  , freq , start_index , end_index , new_magnitude  ) 
     return magnitude 
 
 def get_audiogram_data(fourier_dB, fourier_freq):
-    audiogram_frequencies = [250, 500, 1000, 2000, 4000, 8000] 
+    audiogram_frequencies = [0, 50, 100, 200, 400, 800 , 1600 , 2000 , 4000, 8000, 16000, 20000]
     audiogram_dB = []
 
     for freq in audiogram_frequencies:
         idx = np.argmin(np.abs(fourier_freq - freq))
         audiogram_dB.append(fourier_dB[idx])
     return audiogram_frequencies, audiogram_dB
-    
+
+def custom_transform(x):
+        return np.where(x <= 2000, x, 2000 + (x - 2000) * (2000 / 18000))
+
 def plotAudiogram(data, sampling_rate, audiogram_plot):
-    fourier_transform_magnitude , fourier_transform_freq = fourierTansformWave(audio=data , sampfreq=sampling_rate)
-    audiogram_frequencies, left_ear  = get_audiogram_data(fourier_transform_magnitude, fourier_transform_freq)
+    fourier_transform_magnitude, fourier_transform_freq = fourierTansformWave(
+        audio=data, sampfreq=sampling_rate)
+    
+    audiogram_frequencies, left_ear = get_audiogram_data(
+        fourier_transform_magnitude, fourier_transform_freq)
+    
+    def custom_transform(x):
+        return np.where(x <= 2000, x, 2000 + (x - 2000) * (2000 / 18000))
 
-    refrance = [250, 500, 1000, 2000, 4000, 8000 ]
-    left_ref = [20, 20, 20, 35, 70 , 80 ]
-    right_ref = [15, 20, 25, 40, 65, 75 ]
+    transformed_frequencies = custom_transform(np.array(audiogram_frequencies))
     audiogram_plot.axes.clear()
+    audiogram_plot.axes.plot(transformed_frequencies, left_ear, 'x-', label="Original Signal", color='black')
 
-    audiogram_plot.axes.plot(audiogram_frequencies, left_ear, 'x-', label="Original Signal", color='black')
-    audiogram_plot.axes.plot(refrance, left_ref, 'o-', label="Left Ear", color='blue')
-    audiogram_plot.axes.plot(refrance, right_ref, 's-', label="Right Ear", color='red')
-
+    original_ticks = [0, 1000, 2000, 10000, 20000]  
+    transformed_ticks = custom_transform(np.array(original_ticks)) 
+    audiogram_plot.axes.set_xticks(transformed_ticks)
+    audiogram_plot.axes.set_xticklabels([str(tick) for tick in original_ticks])
     audiogram_plot.axes.invert_yaxis()
     audiogram_plot.axes.set_title("Audiogram")
     audiogram_plot.axes.set_xlabel("Frequency (Hz)")
     audiogram_plot.axes.set_ylabel("Hearing Threshold (dB HL)")
-    audiogram_plot.axes.set_xticks(audiogram_frequencies) 
     audiogram_plot.axes.set_yticks(range(-10, 150, 10))  
     audiogram_plot.axes.grid(True)
     audiogram_plot.axes.legend()
