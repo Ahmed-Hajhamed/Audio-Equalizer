@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QHBoxLayout
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import QUrl, Qt, QTimer
+from PyQt5.QtGui import QIcon
 import Graph
 class AudioPlayerWidget(QWidget):
     def __init__(self, audio_file = None, parent=None):
@@ -61,6 +62,7 @@ class AudioPlayerWidget(QWidget):
         self.other_players = other_players
 
     def stop_and_reset(self):
+        self.remove_icons()
         self.media_player.stop()
         self.slider.setValue(0)
         self.is_paused = True
@@ -90,6 +92,7 @@ class AudioPlayerWidget(QWidget):
         self.time_label.setText(f"{position_in_seconds // 60}:{position_in_seconds % 60:02}")
 
     def play_audio(self):
+        self.remove_icons()
         if self.is_paused:
             for player in self.other_players:
                 # player.play_audio()
@@ -101,3 +104,6 @@ class AudioPlayerWidget(QWidget):
             self.media_player.pause()
             Graph.set_icon(self.play_button,"icons\play.png" )
         self.is_paused = not self.is_paused
+
+    def remove_icons(self):
+        self.play_button.setIcon(QIcon())

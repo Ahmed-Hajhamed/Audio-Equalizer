@@ -11,7 +11,7 @@ import MySignal
 import Audiogram
 import soundfile as sf
 import csv
-from mixertest import AudioPlayerWidget
+from SoundPlayer import AudioPlayerWidget
 import tempfile
 class MainWindow(QMainWindow, GUI.Ui_MainWindow):
     def __init__(self):
@@ -96,6 +96,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
                                 self.equalized_signal.sampling_rate, self.equalized_spectrogram)
         
         self.update_audio_palyer()
+        
     def save_signal(self):
         if self.current_mode_name == 'ECG Abnormalities':
             options = QFileDialog.Options()
