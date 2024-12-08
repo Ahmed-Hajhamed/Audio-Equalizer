@@ -13,18 +13,18 @@ class AudioPlayerWidget(QWidget):
         self.play_button = QPushButton()
         self.play_button.clicked.connect(self.play_audio)
         Graph.set_icon(self.play_button,"icons\play.png" )
-        # self.play_button.setFixedWidth(70)
+        # self.play_button.setFixedWidth(40)
         # pause_button = QPushButton("Pause")
         # pause_button.clicked.connect(self.media_player.pause)
 
         self.stop_button = QPushButton()
         self.stop_button.clicked.connect(self.stop_and_reset)
-        # self.stop_button.setFixedWidth(70)
+        # self.stop_button.setFixedWidth(40)
         Graph.set_icon(self.stop_button, "icons\icons8-reset-96.png" )
         # Create a slider for audio progress
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setRange(0, 100)
-        # self.slider.setFixedWidth(140)
+        # self.slider.setFixedWidth(100)
         self.slider.sliderPressed.connect(self.pause_audio_during_seek)
         self.slider.sliderReleased.connect(self.seek_position)
 

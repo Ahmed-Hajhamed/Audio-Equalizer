@@ -4,7 +4,7 @@ import Graph
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QMainWindow,QFileDialog, QSlider, QLabel,QGridLayout
 from PyQt5.QtCore import Qt
-import UI 
+import GUI
 from qt_material import apply_stylesheet
 import Mode
 import MySignal
@@ -13,7 +13,7 @@ import soundfile as sf
 import csv
 from mixertest import AudioPlayerWidget
 import tempfile
-class MainWindow(QMainWindow, UI.Ui_MainWindow):
+class MainWindow(QMainWindow, GUI.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -29,29 +29,30 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.slider_values = []
         self.fft_of_signal = None
         self.frequencies_of_signal = None
-        self.linearScaleRadioButton.setChecked(True)
-        self.spectrugramCheckBox.setChecked(False)
-        self.spectrugramCheckBox.stateChanged.connect(self.hide_show_spectrogram)
-        self.loadButton.clicked.connect(self.load_signal)
-        self.saveButton.clicked.connect(self.save_signal)
+        self.linear_scale_radioButton.setChecked(True)
+        self.spectrogram_checkbox.setChecked(False)
+        self.spectrogram_checkbox.stateChanged.connect(self.hide_show_spectrogram)
+        self.load_button.clicked.connect(self.load_signal)
+        self.save_button.clicked.connect(self.save_signal)
 
-        self.playButton.clicked.connect(lambda: self.originalGraph.play_pause(self.playButton))
-        self.resetButton.clicked.connect(self.originalGraph.rewind_signal)
-        self.zoomInButton.clicked.connect(self.originalGraph.zoom_in)
-        self.zoomOutButton.clicked.connect(self.originalGraph.zoom_out)
-        self.speedUpButton.clicked.connect(self.originalGraph.speed_up_signal)
-        self.speedDownButton.clicked.connect(self.originalGraph.speed_down_signal)
+        self.play_pause_button.clicked.connect(lambda: self.original_graph.play_pause(self.playButton))
+        self.reset_button.clicked.connect(self.original_graph.rewind_signal)
+        self.zoom_in_button.clicked.connect(self.original_graph.zoom_in)
+        self.zoom_out_button.clicked.connect(self.original_graph.zoom_out)
+        self.speed_up_button.clicked.connect(self.original_graph.speed_up_signal)
+        self.speed_down_button.clicked.connect(self.original_graph.speed_down_signal)
 
-        self.modeComboBox.currentIndexChanged.connect(self.choose_mode)
-        self.linearScaleRadioButton.toggled.connect(self.switch_audiogram_linear_scale)
-        self.audiogramRadioButton.toggled.connect(self.switch_audiogram_linear_scale)
+        self.mode_comboBox.currentIndexChanged.connect(self.choose_mode)
+        self.linear_scale_radioButton.toggled.connect(self.switch_audiogram_linear_scale)
+        self.audiogram_radioButton.toggled.connect(self.switch_audiogram_linear_scale)
         self.load_signal()
         self.switch_audiogram_linear_scale()
+        self.hide_show_spectrogram()
         # self.update_audio_palyer()
         # self.original_media_player.set_other_players([self.equlized_media_player])
         # self.equlized_media_player.set_other_players([self.original_media_player])
-        self.originalGraph.plot_widget.setXLink(self.equalizedGraph.plot_widget)
-        self.originalGraph.plot_widget.setYLink(self.equalizedGraph.plot_widget)
+        self.original_graph.plot_widget.setXLink(self.equalized_graph.plot_widget)
+        self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
 
     def load_signal(self):
         if self.original_signal is None:
@@ -62,37 +63,38 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.signal_file_path=file_path
             self.original_signal= MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
             self.equalized_signal=copy.deepcopy(self.original_signal)
-            self.signalNmaeLabel.setText(self.original_signal.signal_name)
+            self.file_name_label.setText(self.original_signal.signal_name)
             self.fft_of_signal, self.frequencies_of_signal = Mode.compute_fft(self.equalized_signal.amplitude_data,
                                                                                self.equalized_signal.sampling_rate)
             self.band_edges = list(self.original_signal.frquencies_ranges.values())
             self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
             
-            Mode.plot_spectrogram(self.original_signal.amplitude_data,
-                               self.original_signal.sampling_rate, self.originalSpectrugram)
+            # Mode.plot_spectrogram(self.original_signal.amplitude_data,
+            #                    self.original_signal.sampling_rate, self.original_spectrogram)
             
-            self.originalGraph.remove_old_curve()
-            self.equalizedGraph.remove_old_curve()
+            self.original_graph.remove_old_curve()
+            self.equalized_graph.remove_old_curve()
             self.choose_mode()
-            self.originalGraph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
+            self.original_graph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
             self.update_plots()
 
     def update_plots(self):
         self.set_uniform_frequency_ranges()
         # self.originalGraph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
-        self.equalizedGraph.reconstruct_signal_on_equalized_plot(self.equalized_signal.time_data, 
+        self.equalized_graph.reconstruct_signal_on_equalized_plot(self.equalized_signal.time_data, 
                                                                  self.equalized_signal.amplitude_data)
         Audiogram.plotAudiogram(self.equalized_signal.amplitude_data, 
-                                self.equalized_signal.sampling_rate, self.audiogramPlot)
+                                self.equalized_signal.sampling_rate, self.audiogram_plot)
         
         self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
-        self.frequencyDomainPlot.remove_old_curve()
-        self.frequencyDomainPlot.add_signal(self.frequency_domain, start = False, color = 'r')
-        if self.spectrugramCheckBox.isChecked():
+        self.frequency_plot.remove_old_curve()
+        self.frequency_plot.add_signal(self.frequency_domain, start = False, color = 'r')
+        if self.spectrogram_checkbox.isChecked():
             Mode.plot_spectrogram(self.original_signal.amplitude_data,
-                                self.original_signal.sampling_rate, self.originalSpectrugram)
+                                self.original_signal.sampling_rate, self.original_spectrogram)
             Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
-                                self.equalized_signal.sampling_rate, self.equalizedSpecrtugram)
+                                self.equalized_signal.sampling_rate, self.equalized_spectrogram)
+        
         self.update_audio_palyer()
     def save_signal(self):
         if self.current_mode_name == 'ECG Abnormalities':
@@ -128,13 +130,14 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             label = QLabel(str(self.names[i]))
             label.setObjectName("slider_1_label")
             label.setFixedHeight(30)
-            band_layout.addWidget(label, 3, i, 1, 1)
-            band_layout.addWidget(slider, 2, i, 1, 1)
+            band_layout.addWidget(label, 1
+                                  , i, 1, 1)
+            band_layout.addWidget(slider, 0, i, 1, 1)
         return band_layout
     
     def switch_sliders(self):
-        while self.gridLayout_7.count():
-            child = self.gridLayout_7.takeAt(0)
+        while self.slider_layout.count():
+            child = self.slider_layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
         while self.sliders_layout is not None and self.sliders_layout.count():
@@ -152,7 +155,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         # self.update_audio_palyer()
         
     def choose_mode(self):
-        self.current_mode_name = self.modeComboBox.currentText()
+        self.current_mode_name = self.mode_comboBox.currentText()
         self.original_signal.mode = self.current_mode_name
         self.equalized_signal.mode = self.current_mode_name
         self.equalized_signal=copy.deepcopy(self.original_signal)
@@ -160,41 +163,61 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.band_edges = list(self.equalized_signal.frquencies_ranges.values())
         self.names = list(self.equalized_signal.frquencies_ranges.keys())
         self.switch_sliders()
-        self.gridLayout_12.removeItem(self.gridLayout_7)
-        self.gridLayout_12.removeItem(self.sliders_layout)
+        self.graphs_layout.removeItem(self.slider_layout)
+        self.graphs_layout.removeItem(self.sliders_layout)
         self.sliders_layout=self.slider_creator(mode_name=self.current_mode_name)
-        self.gridLayout_12.addLayout(self.sliders_layout,7,2,1,2)
+        self.graphs_layout.addLayout(self.sliders_layout, 5, 0, 1, 6)
         Graph.Graph.current_index = 0
         self.update_plots()
         # self.update_audio_palyer()
 
     def hide_show_spectrogram(self):
-        widgets = [self.gridLayout, self.gridLayout_2, self.gridLayout_20, self.gridLayout_14]
+        widgets = [self.original_spectrogram, self.equalized_spectrogram,
+                    self.original_spectrogram_label, self.equalized_spectrogram_label, self.line_2]
         for widget in widgets:
-            if self.spectrugramCheckBox.isChecked():
-                show_layout(widget)
+            if self.spectrogram_checkbox.isChecked():
+                # show_layout(widget)
+                widget.show()
+                widget.setVisible(True)
+                self.graphs_layout.removeWidget(self.original_graph.plot_widget)
+                self.graphs_layout.removeWidget(self.equalized_graph.plot_widget)
+                self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 6)
+                self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 6)
             else:
-                hide_layout(widget)
-                self.originalSpectrugram.setVisible(False)
+                # hide_layout(widget)
+                # self.graphs_layout.removeWidget(widget)
+                # widget.hide()
+                # widget.setVisible(False)
+                self.original_spectrogram.setVisible(False)
+                self.equalized_spectrogram.setVisible(False)
+                self.original_spectrogram_label.setVisible(False)
+                self.equalized_spectrogram_label.setVisible(False)
+                self.line_2.setVisible(False)
+                self.graphs_layout.removeWidget(self.original_graph.plot_widget)
+                self.graphs_layout.removeWidget(self.equalized_graph.plot_widget)
+                self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 8)
+                self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 8)
+
         self.update_plots()
 
     def switch_audiogram_linear_scale(self):
-        if self.linearScaleRadioButton.isChecked():
-            self.frequencyDomainPlot.plot_widget.setVisible(True)
-            self.audiogramPlot.setVisible(False)
-            self.frequencyDomainLabel.setText("Linear Scale Frequency")
-        elif self.audiogramRadioButton.isChecked():
-            self.frequencyDomainPlot.plot_widget.setVisible(False)
-            self.audiogramPlot.setVisible(True)
-            self.frequencyDomainLabel.setText("Audiogram Scale")
+        if self.linear_scale_radioButton.isChecked():
+            self.frequency_plot.plot_widget.setVisible(True)
+            self.audiogram_plot.setVisible(False)
+            self.frequency_plot_label.setText("Linear Scale Frequency")
+
+        elif self.audiogram_radioButton.isChecked():
+            self.frequency_plot.plot_widget.setVisible(False)
+            self.audiogram_plot.setVisible(True)
+            self.frequency_plot_label.setText("Audiogram Scale")
 
     def update_audio_palyer(self):
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
           sf.write(temp.name, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
         self.original_media_player =AudioPlayerWidget(audio_file=self.signal_file_path)
         self.equlized_media_player =AudioPlayerWidget(audio_file=temp.name)
-        self.gridLayout_player.addWidget(self.original_media_player, 0,6,0,6)
-        self.gridLayout_player2.addWidget(self.equlized_media_player, 0,6, 0,6)
+        self.controls_layout.addWidget(self.original_media_player, 8, 0, 1, 2)
+        self.controls_layout.addWidget(self.equlized_media_player, 9, 0, 1, 2)
         self.original_media_player.set_other_players([self.equlized_media_player])
         self.equlized_media_player.set_other_players([self.original_media_player])
 
