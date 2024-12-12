@@ -2,6 +2,7 @@ import pyqtgraph as pg
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import QTimer, QSize
 import numpy as np
+from PlotWidget import CustomPlotWidget
 
 def set_icon(button, icon_path):
     pixmap = QPixmap(icon_path)
@@ -18,7 +19,7 @@ class Graph():
 
     def __init__(self, centralWidget, is_frequency_domain=False):
         super().__init__()
-        self.plot_widget = pg.PlotWidget(centralWidget)
+        self.plot_widget = pg.PlotWidget(centralWidget) if not is_frequency_domain else CustomPlotWidget(centralWidget)
         self.plot_widget.setFixedHeight(300)
         self.signal = None
         self.current_index = 0

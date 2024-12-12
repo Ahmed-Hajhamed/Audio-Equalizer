@@ -1,3 +1,4 @@
+import array
 import sys
 import copy
 import Graph
@@ -13,6 +14,37 @@ import soundfile as sf
 import csv
 from SoundPlayer import AudioPlayerWidget
 import tempfile
+
+def wiener_filter(signal, noise_detected):
+    """
+    Apply a Wiener filter to a signal in the frequency domain with a detected noise spectrum.
+    
+    Parameters:
+    - signal (ndarray): The noisy signal in the frequency domain (shape: (N,)).
+    - noise_detected (ndarray): The detected noise in the frequency domain (shape: (M,)).
+    
+    Returns:
+    - filtered_signal (ndarray): The filtered signal in the frequency domain (shape: (N,)).
+    """
+    # Interpolate noise spectrum to match signal length
+    noise_interpolated = np.interp(np.linspace(0, 1, len(signal)),
+                                   np.linspace(0, 1, len(noise_detected)),
+                                   np.abs(noise_detected))
+    
+    # Compute Power Spectral Densities (PSDs)
+    psd_signal = np.abs(signal) ** 2
+    psd_noise = noise_interpolated ** 2
+
+    # Compute Wiener filter transfer function
+    H = psd_signal / (psd_signal + psd_noise + 1e-10)  # Add small value to avoid division by zero
+    
+    # Apply the Wiener filter
+    filtered_signal = H * signal
+    
+    return filtered_signal
+
+
+
 class MainWindow(QMainWindow, GUI.Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -29,6 +61,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.slider_values = []
         self.fft_of_signal = None
         self.frequencies_of_signal = None
+        self.noise_data = None
         self.linear_scale_radioButton.setChecked(True)
         self.spectrogram_checkbox.setChecked(False)
         self.spectrogram_checkbox.stateChanged.connect(self.hide_show_spectrogram)
@@ -231,6 +264,17 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
                 self.original_signal.frquencies_ranges[i]=[start,end]
                 start+=max_freq/10
                 end+=max_freq/10
+    
+    def on_region_changed(self):
+        """Handle changes in the selected region."""
+        if self.plot_widget.region:
+            min_x, max_x = self.plot_widget.region.getRegion()
+
+            signal = self.frequency_domain
+            mask = (signal.x_data >= min_x) & (signal.x_data <= max_x)
+            selected_x = signal[0][mask]
+            selected_y = signal[1][mask]
+            self.noise_data = np.array([selected_x, selected_y])  
 
 def hide_layout(layout):
     for i in range(layout.count()):
@@ -244,6 +288,7 @@ def show_layout(layout):
         if widget is not None:
             widget.show()  # Show each widget
 
+    
 app = QApplication(sys.argv)
 window = MainWindow()
 apply_stylesheet(app, theme='dark_cyan.xml')
