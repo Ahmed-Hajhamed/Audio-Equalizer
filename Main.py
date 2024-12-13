@@ -206,6 +206,12 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.sliders_layout=self.slider_creator(mode_name=self.current_mode_name)
         self.graphs_layout.addLayout(self.sliders_layout, 5, 0, 1, 6)
         Graph.Graph.current_index = 0
+        
+        if self.current_mode_name == "Wiener Filter" :
+            self.frequency_plot.plot_widget.set_selection_mode(True)
+        else:
+            self.frequency_plot.plot_widget.set_selection_mode(False)
+        
         self.update_plots()
         # self.update_audio_palyer()
 

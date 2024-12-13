@@ -17,7 +17,7 @@ available_frequencies = {
                       "Wolf": [450, 1100],
                       "Crow": [1100, 3000],
                       "Bat": [3000, 9000]},
-    'ECG Abnormalities': {"Normal": [0, 35],
+    'Wiener Filter': {"Normal": [0, 35],
                           "Arithmia 1 ": [48, 52],
                           "Arithmia 2": [55, 94],
                           "Arithmia 3": [95, 155]}}

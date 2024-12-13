@@ -192,7 +192,7 @@ class Ui_MainWindow(object):
         self.mode_comboBox.setItemText(0, _translate("MainWindow", "Uniform Mode"))
         self.mode_comboBox.setItemText(1, _translate("MainWindow", "Music"))
         self.mode_comboBox.setItemText(2, _translate("MainWindow", "Animal Sounds"))
-        self.mode_comboBox.setItemText(3, _translate("MainWindow", "ECG Abnormalities"))
+        self.mode_comboBox.setItemText(3, _translate("MainWindow", "Wiener Filter"))
         self.choose_mode_label.setText(_translate("MainWindow", "Select Mode:"))
         self.spectrogram_checkbox.setText(_translate("MainWindow", "Spectrogram"))
         self.file_name_label.setText(_translate("MainWindow", "File Name"))

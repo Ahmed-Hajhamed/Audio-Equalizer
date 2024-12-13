@@ -7,6 +7,7 @@ class CustomPlotWidget(pg.PlotWidget):
         self.graph = None  # Placeholder for the reference to Graph
         self.is_selecting = False  # To track whether the user is selecting a region
         self.start_pos = None  # Initial mouse click position
+        self.selection_enabled = False  # Tracks if selection mode is active
 
         # Create the region but keep it hidden initially
         self.region = pg.LinearRegionItem()
@@ -18,9 +19,16 @@ class CustomPlotWidget(pg.PlotWidget):
     def set_graph_reference(self, graph):
         """Set a reference to the Graph instance."""
         self.graph = graph
+    
+    def set_selection_mode(self, enabled):
+        """Enable or disable selection mode."""
+        self.selection_enabled = enabled
+        if not enabled:
+            # Hide the region if the mode is disabled
+            self.region.setVisible(False)
 
     def mouseDoubleClickEvent(self, event):
-        if event.button() == 2:  # Ignore right-click
+        if not self.selection_enabled or event.button() == 2:  # Ignore right-click
             return
 
         if event.button() == 1:  # Handle only left-click
@@ -35,7 +43,7 @@ class CustomPlotWidget(pg.PlotWidget):
         # Don't call super().mousePressEvent for left-click to avoid conflicts
 
     def mouseMoveEvent(self, event):
-        if self.is_selecting:
+        if self.is_selecting and self.selection_enabled:
             # Dynamically update the region as the user drags the mouse
             current_pos = self.plotItem.vb.mapSceneToView(event.pos()).x()
             self.region.setRegion([self.start_pos, current_pos])
@@ -44,7 +52,7 @@ class CustomPlotWidget(pg.PlotWidget):
 
     def mouseReleaseEvent(self, event):
         # Finish the selection
-        if self.is_selecting:
+        if self.is_selecting and self.selection_enabled:
             self.is_selecting = False
             end_pos = self.plotItem.vb.mapSceneToView(event.pos()).x()
 
