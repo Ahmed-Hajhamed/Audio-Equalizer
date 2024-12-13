@@ -1,4 +1,5 @@
 import array
+import signal
 import sys
 import copy
 import Graph
@@ -75,6 +76,9 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.speed_up_button.clicked.connect(self.original_graph.speed_up_signal)
         self.speed_down_button.clicked.connect(self.original_graph.speed_down_signal)
 
+        self.confirm_weiner_filter.clicked.connect(self.filter_signal)
+        self.reset_signal_after_wiener_filter.clicked.connect(self.reset_signal_of_wiener_filter)
+
         self.mode_comboBox.currentIndexChanged.connect(self.choose_mode)
         self.linear_scale_radioButton.toggled.connect(self.switch_audiogram_linear_scale)
         self.audiogram_radioButton.toggled.connect(self.switch_audiogram_linear_scale)
@@ -97,9 +101,9 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.original_signal= MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
             self.equalized_signal=copy.deepcopy(self.original_signal)
             self.file_name_label.setText(self.original_signal.signal_name)
-            self.fft_of_signal, self.frequencies_of_signal = Mode.compute_fft(self.equalized_signal.amplitude_data,
-                                                                               self.equalized_signal.sampling_rate)
-            self.frequency_domain_of_orignal_signal = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
+            self.fft_of_signal, self.frequencies_of_signal = Mode.compute_fft(self.original_signal.amplitude_data,
+                                                                               self.original_signal.sampling_rate)
+            # self.frequency_domain_of_orignal_signal = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
             self.band_edges = list(self.original_signal.frquencies_ranges.values())
             self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
             
@@ -197,14 +201,23 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.original_signal.mode = self.current_mode_name
         self.equalized_signal.mode = self.current_mode_name
         self.equalized_signal=copy.deepcopy(self.original_signal)
-        self.equalized_signal.frquencies_ranges = MySignal.available_frequencies[self.current_mode_name]
-        self.band_edges = list(self.equalized_signal.frquencies_ranges.values())
-        self.names = list(self.equalized_signal.frquencies_ranges.keys())
-        self.switch_sliders()
-        self.graphs_layout.removeItem(self.slider_layout)
-        self.graphs_layout.removeItem(self.sliders_layout)
-        self.sliders_layout=self.slider_creator(mode_name=self.current_mode_name)
-        self.graphs_layout.addLayout(self.sliders_layout, 5, 0, 1, 6)
+        
+        if self.current_mode_name != "Wiener Filter":
+            show_layout(self.sliders_layout)
+            hide_layout(self.h_layout_of_button_of_wiener)
+
+            self.equalized_signal.frquencies_ranges = MySignal.available_frequencies[self.current_mode_name]
+            self.band_edges = list(self.equalized_signal.frquencies_ranges.values())
+            self.names = list(self.equalized_signal.frquencies_ranges.keys())
+            self.switch_sliders()
+            self.graphs_layout.removeItem(self.slider_layout)
+            self.graphs_layout.removeItem(self.sliders_layout)
+            self.sliders_layout=self.slider_creator(mode_name=self.current_mode_name)
+            self.graphs_layout.addLayout(self.sliders_layout, 5, 0, 1, 6)
+        else :
+            hide_layout(self.sliders_layout)
+            show_layout(self.h_layout_of_button_of_wiener)
+
         Graph.Graph.current_index = 0
         
         if self.current_mode_name == "Wiener Filter" :
@@ -273,26 +286,30 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             for i in range (1, 11):
                 self.original_signal.frquencies_ranges[i]=[start,end]
                 start+=max_freq/10
-                end+=max_freq/10
+                end+=max_freq/10 
     
-    def on_region_changed(self):
-        """Handle changes in the selected region."""
-        if self.plot_widget.region:
-            min_x, max_x = self.plot_widget.region.getRegion()
+    def filter_signal(self):
+        noise = self.frequency_plot.selected_data[1]
+        signal = self.frequency_plot.signal[1]
+        signal = wiener_filter(signal, noise)
+        # self.frequency_domain.signal[1] = signal
 
-            signal = self.frequency_domain
-            mask = (signal.x_data >= min_x) & (signal.x_data <= max_x)
-            selected_x = signal[0][mask]
-            selected_y = signal[1][mask]
-            self.noise_data = np.array([selected_x, selected_y])  
+        self.frequency_plot.plot_widget.region.setVisible(False)
+
+    def reset_signal_of_wiener_filter(self):
+        pass
 
 def hide_layout(layout):
+    if layout is None:
+        return
     for i in range(layout.count()):
         widget = layout.itemAt(i).widget()
         if widget is not None:
             widget.hide()
 
 def show_layout(layout):
+    if layout is None:
+        return
     for i in range(layout.count()):
         widget = layout.itemAt(i).widget()
         if widget is not None:

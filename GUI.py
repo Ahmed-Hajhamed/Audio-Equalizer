@@ -97,6 +97,21 @@ class Ui_MainWindow(object):
         self.speed_up_button.setObjectName("speed_up_button")
         self.graphs_layout.addWidget(self.speed_up_button, 4, 5, 1, 1)
 
+        self.h_layout_of_button_of_wiener = QtWidgets.QHBoxLayout()
+        self.h_layout_of_button_of_wiener.setObjectName("h_layout_of_button_of_wiener")
+
+        self.confirm_weiner_filter = QtWidgets.QPushButton(self.centralwidget)
+        self.confirm_weiner_filter.setObjectName("confirm_weiner_filter")
+        self.confirm_weiner_filter.setVisible(False)
+        self.h_layout_of_button_of_wiener.addWidget(self.confirm_weiner_filter)
+
+        self.reset_signal_after_wiener_filter = QtWidgets.QPushButton(self.centralwidget)
+        self.reset_signal_after_wiener_filter.setObjectName("reset_signal_after_wiener_filter")
+        self.reset_signal_after_wiener_filter.setVisible(False)
+        self.h_layout_of_button_of_wiener.addWidget(self.reset_signal_after_wiener_filter)
+
+        self.graphs_layout.addLayout(self.h_layout_of_button_of_wiener, 5, 0, 1, 6)
+
         self.equalized_graph = Graph.Graph(self.centralwidget)
         self.equalized_graph.plot_widget.setObjectName("equalized_graph")
         self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 6)
@@ -208,6 +223,8 @@ class Ui_MainWindow(object):
         self.zoom_out_button.setText(_translate("MainWindow", "Zoom Out"))
         self.speed_down_button.setText(_translate("MainWindow", "Speed Down"))
         self.zoom_in_button.setText(_translate("MainWindow", "Zoom In"))
+        self.confirm_weiner_filter.setText(_translate("MainWindow", "Confirm"))
+        self.reset_signal_after_wiener_filter.setText(_translate("MainWindow", "Reset Signal"))
         self.equalized_graph_label.setText(_translate("MainWindow", "Equalized Audio"))
         self.frequency_plot_label.setText(_translate("MainWindow", "TextLabel"))
 

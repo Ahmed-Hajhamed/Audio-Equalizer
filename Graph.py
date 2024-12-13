@@ -20,8 +20,9 @@ class Graph():
     def __init__(self, centralWidget, is_frequency_domain=False):
         super().__init__()
         self.plot_widget = pg.PlotWidget(centralWidget) if not is_frequency_domain else CustomPlotWidget(centralWidget)
-        self.plot_widget.setFixedHeight(300)
+        # self.plot_widget.setFixedHeight(300)
         self.signal = None
+        self.selected_data = None
         self.current_index = 0
         self.current_index_increment = 10
         self.is_paused = False
@@ -31,6 +32,9 @@ class Graph():
         self.is_frequency_domain=is_frequency_domain
         if not self.is_frequency_domain:
             Graph.timer.timeout.connect(self.update_plot)
+        else :
+            print("its wrok")
+            self.plot_widget.region.sigRegionChanged.connect(self.on_region_changed)
 
     def add_signal(self, signal, start=True, color=None):
         color = "b" if color is None else color
@@ -42,7 +46,8 @@ class Graph():
             self.curve = self.plot_widget.plot(signal[0][:len(signal[0])], signal[1][:len(signal[1])], pen=color)
         self.set_plot_limits()
         if start:
-            self.timer.start()
+            Graph.timer.start()
+            # self.timer.start()
 
     def update_plot(self):
         if Graph.current_index < len(self.signal[0]):
@@ -57,19 +62,21 @@ class Graph():
     def play_pause(self, play_pause_button):
         if self.is_paused:
             Graph.timer.start()
-            set_icon(play_pause_button, "icons\pause.png")
+            # set_icon(play_pause_button, "icons\pause.png")
+            play_pause_button.setText("PAUSE")
         else:
             Graph.timer.stop()
-            set_icon(play_pause_button, "icons/play.png")
+            # set_icon(play_pause_button, "icons/play.png")
+            play_pause_button.setText("PLAY")
         self.is_paused = not self.is_paused
 
     def rewind_signal(self):
         if len(self.signal) > 0:
             Graph.current_index = 0
-            self.timer.start()
+            Graph.timer.start()
 
     def off_signal(self):
-        self.timer.stop()
+        Graph.timer.stop()
         self.current_index = 0
         self.is_paused = False
         self.graph_1.setLimits(xMin=0, xMax=2, yMin=-2, yMax=2)
@@ -127,4 +134,15 @@ class Graph():
     def speed_down_signal(self):
         if Graph.current_index_increment >= 10:
             Graph.current_index_increment -= 5
+    
+    def on_region_changed(self):
+        """Handle changes in the selected region."""
+        if self.plot_widget.region:
+            min_x, max_x = self.plot_widget.region.getRegion()
+
+            signal = self.signal
+            mask = (signal[0] >= min_x) & (signal[0] <= max_x)
+            selected_x = signal[0][mask]
+            selected_y = signal[1][mask]
+            self.selected_data = np.array([selected_x, selected_y])
 
