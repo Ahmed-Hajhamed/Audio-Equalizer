@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.signal import spectrogram
+from scipy.signal import stft
 
 def compute_fft(signal_amplitudes, sampling_rate):
     fft_result =   np.fft.fft(signal_amplitudes)
@@ -41,15 +41,24 @@ def plot_spectrogram(signal, sampling_rate, canvas):
     """
     Plot spectrogram using Matplotlib.
     """
-    sampled_frequencies, segment_times, Sxx = spectrogram(signal, fs= sampling_rate, nperseg=128, noverlap=64)
-    Sxx_db = 10 * np.log10(Sxx + 1e-10) 
+    positive_freqs = signal[0]
+    positive_magnitude = signal[1]
+    # sampled_frequencies, segment_times, Sxx = stft(signal, fs= sampling_rate, nperseg=128, noverlap=64)
+    frame_size = (len(positive_freqs) - 1) * 2  # Reconstruct the original frame size
+    step_size = frame_size // 2  # Assuming 50% overlap
+    num_frames = positive_magnitude.shape[0]
+    segment_times = np.arange(num_frames) * (step_size / sampling_rate)
+
+    Sxx_db = 20 * np.log10(positive_magnitude.T + 1e-10) 
 
     if canvas.no_label:
         canvas.no_label = False
         canvas.vmin, canvas.vmax = np.min(Sxx_db), np.max(Sxx_db)
 
+
+
     canvas.axes.clear()
-    cax = canvas.axes.pcolormesh(segment_times, sampled_frequencies, Sxx_db, shading='gouraud', cmap='plasma', vmin=canvas.vmin, vmax=canvas.vmax)
+    cax = canvas.axes.pcolormesh(segment_times, positive_freqs, Sxx_db, shading='gouraud', cmap='plasma', vmin=canvas.vmin, vmax=canvas.vmax)
     canvas.axes.set_xlabel("Time (s)")
     canvas.axes.set_ylabel("Frequency (Hz)")
     canvas.axes.set_title("Spectrogram")
