@@ -50,7 +50,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.current_mode_name = 'Uniform Mode'
-        self.signal_file_path= 'audio\\file_example_WAV_1MG.wav'
+        self.signal_file_path= 'audio/music2.wav'
         self.sliders_layout=None
         self.gain = None
         self.original_signal=None
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.load_button.clicked.connect(self.load_signal)
         self.save_button.clicked.connect(self.save_signal)
 
-        self.play_pause_button.clicked.connect(lambda: self.original_graph.play_pause(self.playButton))
+        self.play_pause_button.clicked.connect(lambda: self.original_graph.play_pause(self.play_pause_button))
         self.reset_button.clicked.connect(self.original_graph.rewind_signal)
         self.zoom_in_button.clicked.connect(self.original_graph.zoom_in)
         self.zoom_out_button.clicked.connect(self.original_graph.zoom_out)
@@ -99,6 +99,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.file_name_label.setText(self.original_signal.signal_name)
             self.fft_of_signal, self.frequencies_of_signal = Mode.compute_fft(self.equalized_signal.amplitude_data,
                                                                                self.equalized_signal.sampling_rate)
+            self.frequency_domain_of_orignal_signal = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
             self.band_edges = list(self.original_signal.frquencies_ranges.values())
             self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
             
@@ -109,6 +110,10 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.equalized_graph.remove_old_curve()
             self.choose_mode()
             self.original_graph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
+
+            Mode.plot_spectrogram(self.original_signal.amplitude_data,
+                                self.original_signal.sampling_rate, self.original_spectrogram)
+                
             self.update_plots()
 
     def update_plots(self):
@@ -122,9 +127,8 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
         self.frequency_plot.remove_old_curve()
         self.frequency_plot.add_signal(self.frequency_domain, start = False, color = 'r')
+        
         if self.spectrogram_checkbox.isChecked():
-            Mode.plot_spectrogram(self.original_signal.amplitude_data,
-                                self.original_signal.sampling_rate, self.original_spectrogram)
             Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
                                 self.equalized_signal.sampling_rate, self.equalized_spectrogram)
         
