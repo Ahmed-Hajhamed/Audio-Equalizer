@@ -3,7 +3,27 @@ from qt_material import apply_stylesheet
 import Graph
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
+# Define a custom style for gray background
+gray_style = {
+    'axes.facecolor': '#2E2E2E',    # Dark gray background for axes
+    'figure.facecolor': '#2E2E2E',  # Dark gray background for the figure
+    'axes.edgecolor': 'white',      # White edges for axes
+    'axes.labelcolor': 'white',     # White labels
+    'xtick.color': 'white',         # White tick marks on x-axis
+    'ytick.color': 'white',         # White tick marks on y-axis
+    'text.color': 'white',          # White text
+    'grid.color': '#444444',        # Slightly lighter grid lines
+    'grid.linestyle': '--',         # Dashed grid lines
+    'lines.color': 'cyan',          # Default line color
+    'patch.edgecolor': 'white',     # Edge color for patches
+    'legend.facecolor': '#4C4C4C',  # Darker gray background for legends
+    'legend.edgecolor': 'white',    # White edges for legends
+}
+
+# Apply the custom style
+plt.style.use(gray_style)
 class SpectrogramPlot(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
