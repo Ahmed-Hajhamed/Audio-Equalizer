@@ -1,8 +1,5 @@
-import array
-import signal
 import sys
 import copy
-import Graph
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QMainWindow,QFileDialog, QSlider, QLabel,QGridLayout
 from PyQt5.QtCore import Qt
@@ -85,9 +82,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.load_signal()
         self.switch_audiogram_linear_scale()
         self.hide_show_spectrogram()
-        # self.update_audio_palyer()
-        # self.original_media_player.set_other_players([self.equlized_media_player])
-        # self.equlized_media_player.set_other_players([self.original_media_player])
+
         self.original_graph.plot_widget.setXLink(self.equalized_graph.plot_widget)
         self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
 
@@ -101,9 +96,10 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.original_signal= MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
             self.equalized_signal=copy.deepcopy(self.original_signal)
             self.file_name_label.setText(self.original_signal.signal_name)
+
             self.fft_of_signal, self.frequencies_of_signal = Mode.compute_fft(self.original_signal.amplitude_data,
                                                                                self.original_signal.sampling_rate)
-            # self.frequency_domain_of_orignal_signal = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
+            
             self.band_edges = list(self.original_signal.frquencies_ranges.values())
             self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
             
@@ -122,15 +118,13 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 
     def update_plots(self):
         self.set_uniform_frequency_ranges()
-        # self.originalGraph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
-        self.equalized_graph.reconstruct_signal_on_equalized_plot(self.equalized_signal.time_data, 
-                                                                 self.equalized_signal.amplitude_data)
+        self.equalized_graph.add_signal(np.array([self.equalized_signal.time_data, self.equalized_signal.amplitude_data]))
         Audiogram.plotAudiogram(self.equalized_signal.amplitude_data, 
                                 self.equalized_signal.sampling_rate, self.audiogram_plot)
         
         self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
         self.frequency_plot.remove_old_curve()
-        self.frequency_plot.add_signal(self.frequency_domain, start = False, color = 'r')
+        self.frequency_plot.add_signal(self.frequency_domain, color = 'r')
         
         if self.spectrogram_checkbox.isChecked():
             Mode.plot_spectrogram(self.equalized_signal.amplitude_data,
@@ -194,7 +188,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.equalized_signal.time_data = np.linspace(0, len(self.equalized_signal.amplitude_data)/ self.equalized_signal.sampling_rate,
                                                        len(self.equalized_signal.amplitude_data))
         self.update_plots()
-        # self.update_audio_palyer()
         
     def choose_mode(self):
         self.current_mode_name = self.mode_comboBox.currentText()
@@ -218,12 +211,11 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             hide_layout(self.sliders_layout)
             show_layout(self.h_layout_of_button_of_wiener)
 
-        Graph.Graph.current_index = 0
         
         if self.current_mode_name == "Wiener Filter" :
-            self.frequency_plot.plot_widget.set_selection_mode(True)
+            self.original_graph.plot_widget.set_selection_mode(True)
         else:
-            self.frequency_plot.plot_widget.set_selection_mode(False)
+            self.original_graph.plot_widget.set_selection_mode(False)
         
         self.update_plots()
         # self.update_audio_palyer()
@@ -269,14 +261,17 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.frequency_plot_label.setText("Audiogram Scale")
 
     def update_audio_palyer(self):
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
-          sf.write(temp.name, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
-        self.original_media_player =AudioPlayerWidget(audio_file=self.signal_file_path)
-        self.equlized_media_player =AudioPlayerWidget(audio_file=temp.name)
-        self.controls_layout.addWidget(self.original_media_player, 8, 0, 1, 2)
-        self.controls_layout.addWidget(self.equlized_media_player, 9, 0, 1, 2)
-        self.original_media_player.set_other_players([self.equlized_media_player])
-        self.equlized_media_player.set_other_players([self.original_media_player])
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
+                sf.write(temp.name, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
+            self.original_media_player =AudioPlayerWidget(audio_file=self.signal_file_path)
+            self.equlized_media_player =AudioPlayerWidget(audio_file=temp.name)
+            self.controls_layout.addWidget(self.original_media_player, 8, 0, 1, 2)
+            self.controls_layout.addWidget(self.equlized_media_player, 9, 0, 1, 2)
+            self.original_media_player.set_other_players([self.equlized_media_player])
+            self.equlized_media_player.set_other_players([self.original_media_player])
+        except:
+            print("update_audio_palyer line 268")
 
     def set_uniform_frequency_ranges(self):
         if self.current_mode_name=='Uniform Mode':
@@ -289,12 +284,13 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
                 end+=max_freq/10 
     
     def filter_signal(self):
-        noise = self.frequency_plot.selected_data[1]
-        signal = self.frequency_plot.signal[1]
-        signal = wiener_filter(signal, noise)
-        # self.frequency_domain.signal[1] = signal
+        if self.original_graph.selected_data[1]:
+            noise = self.original_graph.selected_data[1]
+            signal = self.original_graph.signal[1]
+            signal = wiener_filter(signal, noise)
+            # self.frequency_domain.signal[1] = signal
 
-        self.frequency_plot.plot_widget.region.setVisible(False)
+        self.original_graph.plot_widget.region.setVisible(False)
 
     def reset_signal_of_wiener_filter(self):
         pass

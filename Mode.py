@@ -1,9 +1,10 @@
 import numpy as np
-from scipy.signal import stft, spectrogram
+from scipy.signal import spectrogram
 
 def compute_fft(signal_amplitudes, sampling_rate):
     fft_result =   np.fft.fft(signal_amplitudes)
     frequencies =   np.fft.fftfreq(len(signal_amplitudes), d=1 /sampling_rate)
+    print(len(fft_result) , len(frequencies))
     return fft_result, frequencies
 
 def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
@@ -18,7 +19,7 @@ def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
     significant_indices = np.where(positive_magnitude > magnitude_threshold)
     positive_freqs = positive_freqs[significant_indices]
     positive_magnitude = positive_magnitude[significant_indices]
-    
+    print(len(positive_freqs))
     return positive_freqs, positive_magnitude
 
 def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):

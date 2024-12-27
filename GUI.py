@@ -136,12 +136,12 @@ class Ui_MainWindow(object):
         self.equalized_graph.plot_widget.setObjectName("equalized_graph")
         self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 6)
 
-        self.original_graph = Graph.Graph(self.centralwidget)
+        self.original_graph = Graph.Graph(self.centralwidget, is_frequency_domain= False , winer=True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
-        # sizePolicy.setHeightForWidth(self.original_graph.plot_widget.sizePolicy().hasHeightForWidth())
-        # self.original_graph.plot_widget.setSizePolicy(sizePolicy)
+
+
         self.original_graph.plot_widget.setObjectName("original_graph")
         self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 6)
         self.original_spectrogram_label = QtWidgets.QLabel(self.centralwidget)
