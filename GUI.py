@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # Define a custom style for gray background
 gray_style = {
     'axes.facecolor': '#2E2E2E',    # Dark gray background for axes
-    'figure.facecolor': '#2E2E2E',  # Dark gray background for the figure
+    'figure.facecolor': '#31363b',  # Dark gray background for the figure
     'axes.edgecolor': 'white',      # White edges for axes
     'axes.labelcolor': 'white',     # White labels
     'xtick.color': 'white',         # White tick marks on x-axis

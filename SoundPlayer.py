@@ -3,6 +3,8 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import QUrl, Qt, QTimer
 from PyQt5.QtGui import QIcon
 import Graph
+
+
 class AudioPlayerWidget(QWidget):
     def __init__(self, audio_file = None, parent=None):
         super().__init__(parent)
