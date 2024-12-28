@@ -17,7 +17,7 @@ available_frequencies = {
                       "Wolf": [450, 1100],
                       "Crow": [1100, 3000],
                       "Bat": [3000, 9000]},
-    'Wiener Filter': 0}
+    'Wiener Filter': {"test":0}}
 
 class Signal:
     def __init__(self, mode, file_path=None, x_data=None, y_data=None, name=None):

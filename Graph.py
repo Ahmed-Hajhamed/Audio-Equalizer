@@ -85,15 +85,15 @@ class Graph():
         if len(self.signal[0])>0:
             x_max = self.signal[0][-1]
 
-            y_min = min(self.signal[1])
-            y_max = max(self.signal[1])
+            # y_min = min(self.signal[1])
+            # y_max = max(self.signal[1])
 
-            y_min = y_min - y_min * 0.05 if y_min > 0 else y_min + y_min * 0.05
+            # y_min = y_min - y_min * 0.05 if y_min > 0 else y_min + y_min * 0.05
 
-            self.plot_widget.setLimits(
-                xMin=-0.1, xMax=x_max + 0.1,
-                yMin=y_min, yMax=y_max + y_max * 0.05
-            )
+            # self.plot_widget.setLimits(
+            #     xMin=-0.1, xMax=x_max + 0.1,
+            #     yMin=y_min, yMax=y_max + y_max * 0.05
+            # )
             
 
     def remove_old_curve(self):

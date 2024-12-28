@@ -1,6 +1,5 @@
 import sys
 import copy
-from unittest import result
 from matplotlib.mlab import psd
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QMainWindow,QFileDialog, QSlider, QLabel,QGridLayout
@@ -22,7 +21,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.current_mode_name = 'Uniform Mode'
-        self.signal_file_path= 'audio/instument_mode.wav'
+        self.signal_file_path= 'audio/alarm_beep.wav'
         self.sliders_layout=None
         self.gain = None
         self.original_signal=None
@@ -59,7 +58,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.hide_show_spectrogram()
 
         self.original_graph.plot_widget.setXLink(self.equalized_graph.plot_widget)
-        # self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
+        self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
 
     def load_signal(self):
         if self.original_signal is None:
@@ -67,6 +66,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         else:
             file_path, _ = QFileDialog.getOpenFileName(self, "Select File", "", "All Files (*);;Text Files (*.txt)")
         if file_path:
+            self.fft_of_signal_of_wiener = None
             self.signal_file_path=file_path
             self.original_signal= MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
             self.equalized_signal=copy.deepcopy(self.original_signal)
@@ -275,22 +275,17 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 
     def wiener_filter(self, noise_detected):
         # if len(noise_detected) < len(self.original_signal.amplitude_data):
-        #     noise_detected = np.pad(noise_detected, (0, len(self.original_signal.amplitude_data) - len(noise_detected)), mode='constant')
+            # noise_detected = np.pad(noise_detected, (0, len(self.original_signal.amplitude_data) - len(noise_detected)), mode='constant')
+            # noise_detected = np.resize(noise_detected, self.original_signal.amplitude_data.shape)
         
-        noise_detected = np.fft.fft(noise_detected)
         # Compute Power Spectral Densities (PSDs)
-        psd_noise = np.abs(noise_detected) ** 2
-        psd_signal = np.abs(self.fft_of_signal) ** 2
-        
+        psd_signal = np.abs(self.fft_of_signal_of_wiener) ** 2
+        psd_noise = np.abs(np.fft.fft(noise_detected)) ** 2
         if len(psd_noise) < len(psd_signal):
-            test = np.resize(psd_noise, len(psd_signal)-len(psd_noise))
-            result = np.stack((psd_noise, test), axis=0)
-            # psd_noise = np.pad(psd_noise, (0, len(psd_signal) - len(psd_noise)), mode='constant')
-        pprint(result)
-        pprint(psd_signal)
+            psd_noise = np.resize(psd_noise, psd_signal.shape)
         # Compute Wiener filter transfer function
-        H = psd_signal / (psd_signal + result + 1e-10)  # Add small value to avoid division by zero
-        pprint(H)
+        H = psd_signal / (psd_signal + psd_noise + 1e-10)  # Add small value to avoid division by zero
+
         # Apply the Wiener filter
         self.fft_of_signal = H * self.fft_of_signal
         self.equalized_signal.amplitude_data = np.fft.ifft(self.fft_of_signal).real
