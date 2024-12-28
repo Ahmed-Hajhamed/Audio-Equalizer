@@ -15,6 +15,7 @@ class Graph():
 
     def __init__(self, centralWidget, is_frequency_domain=False, winer = False):
         super().__init__()
+        self.centralWidget = centralWidget
         self.plot_widget = pg.PlotWidget(centralWidget) if winer == False else CustomPlotWidget(centralWidget)
         self.plot_widget.setFixedHeight(200)
         self.signal = None
@@ -24,25 +25,25 @@ class Graph():
         self.is_paused = False
         self.is_off = False
         self.is_frequency_domain=is_frequency_domain
+        self.curve = None
 
         if winer:
             self.plot_widget.region.sigRegionChanged.connect(self.on_region_changed)
 
     def add_signal(self, signal, color=None):
         if signal is not None:
-            self.remove_old_curve()
+            # self.remove_old_curve()
             color = "b" if color is None else color
             self.signal = signal
-        
-            self.plot_widget.plot(signal[0], signal[1], pen=color)        
-            self.plot_widget.plot(signal[0], signal[1], pen=color)
+
+            self.plot_widget.removeItem(self.curve)
+            self.curve = self.plot_widget.plot(signal[0], signal[1], pen=color)        
+            
             self.set_plot_limits()
 
     def update_plot(self):
         if self.signal is not None:
-            self.plot_widget.plot(self.signal[0], self.signal[1], pen="r")
-            
-            self.plot_widget.plot(self.signal[0], self.signal[1], pen="r")
+            self.curve.setData(self.signal[0], self.signal[1], pen="green")
 
 
     def play_pause(self, play_pause_button):
@@ -96,7 +97,9 @@ class Graph():
             
 
     def remove_old_curve(self):
-        self.plot_widget.clear()
+        if self.curve:
+            self.plot_widget.removeItem(self.curve)
+            # self.plot_widget = CustomPlotWidget(self.centralWidget)
 
     def speed_up_signal(self):
         pass
@@ -106,13 +109,12 @@ class Graph():
     
     def on_region_changed(self):
         """Handle changes in the selected region."""
-        print("test_109_graph")
         if self.plot_widget.region:
             min_x, max_x = self.plot_widget.region.getRegion()
-
             signal = self.signal
             mask = (signal[0] >= min_x) & (signal[0] <= max_x)
             selected_x = signal[0][mask]
             selected_y = signal[1][mask]
             self.selected_data = np.array([selected_x, selected_y])
+
 

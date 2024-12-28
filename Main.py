@@ -1,5 +1,7 @@
 import sys
 import copy
+from unittest import result
+from matplotlib.mlab import psd
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QMainWindow,QFileDialog, QSlider, QLabel,QGridLayout
 from PyQt5.QtCore import Qt
@@ -12,35 +14,7 @@ import soundfile as sf
 import csv
 from SoundPlayer import AudioPlayerWidget
 import tempfile
-
-def wiener_filter(signal, noise_detected):
-    """
-    Apply a Wiener filter to a signal in the frequency domain with a detected noise spectrum.
-    
-    Parameters:
-    - signal (ndarray): The noisy signal in the frequency domain (shape: (N,)).
-    - noise_detected (ndarray): The detected noise in the frequency domain (shape: (M,)).
-    
-    Returns:
-    - filtered_signal (ndarray): The filtered signal in the frequency domain (shape: (N,)).
-    """
-    # Interpolate noise spectrum to match signal length
-    noise_interpolated = np.interp(np.linspace(0, 1, len(signal)),
-                                   np.linspace(0, 1, len(noise_detected)),
-                                   np.abs(noise_detected))
-    
-    # Compute Power Spectral Densities (PSDs)
-    psd_signal = np.abs(signal) ** 2
-    psd_noise = noise_interpolated ** 2
-
-    # Compute Wiener filter transfer function
-    H = psd_signal / (psd_signal + psd_noise + 1e-10)  # Add small value to avoid division by zero
-    
-    # Apply the Wiener filter
-    filtered_signal = H * signal
-    
-    return filtered_signal
-
+from pprint import pprint
 
 
 class MainWindow(QMainWindow, GUI.Ui_MainWindow):
@@ -48,7 +22,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.current_mode_name = 'Uniform Mode'
-        self.signal_file_path= 'audio/music2.wav'
+        self.signal_file_path= 'audio/instument_mode.wav'
         self.sliders_layout=None
         self.gain = None
         self.original_signal=None
@@ -58,6 +32,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.number_of_sliders = 10
         self.slider_values = []
         self.fft_of_signal = None
+        self.fft_of_signal_of_wiener= None
         self.frequencies_of_signal = None
         self.noise_data = None
         self.linear_scale_radioButton.setChecked(True)
@@ -84,7 +59,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.hide_show_spectrogram()
 
         self.original_graph.plot_widget.setXLink(self.equalized_graph.plot_widget)
-        self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
+        # self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
 
     def load_signal(self):
         if self.original_signal is None:
@@ -214,8 +189,11 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         
         if self.current_mode_name == "Wiener Filter" :
             self.original_graph.plot_widget.set_selection_mode(True)
+            self.fft_of_signal_of_wiener = self.fft_of_signal
         else:
             self.original_graph.plot_widget.set_selection_mode(False)
+            self.fft_of_signal = self.fft_of_signal_of_wiener if self.fft_of_signal_of_wiener is not None else self.fft_of_signal
+            
         
         self.update_plots()
         # self.update_audio_palyer()
@@ -284,17 +262,45 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
                 end+=max_freq/10 
     
     def filter_signal(self):
-        if self.original_graph.selected_data[1]:
+        self.fft_of_signal = self.fft_of_signal_of_wiener
+        if len(self.original_graph.selected_data[1]) > 0 :
             noise = self.original_graph.selected_data[1]
-            signal = self.original_graph.signal[1]
-            signal = wiener_filter(signal, noise)
-            # self.frequency_domain.signal[1] = signal
+            self.wiener_filter(noise)
 
         self.original_graph.plot_widget.region.setVisible(False)
+        self.update_plots()
 
     def reset_signal_of_wiener_filter(self):
         pass
 
+    def wiener_filter(self, noise_detected):
+        # if len(noise_detected) < len(self.original_signal.amplitude_data):
+        #     noise_detected = np.pad(noise_detected, (0, len(self.original_signal.amplitude_data) - len(noise_detected)), mode='constant')
+        
+        noise_detected = np.fft.fft(noise_detected)
+        # Compute Power Spectral Densities (PSDs)
+        psd_noise = np.abs(noise_detected) ** 2
+        psd_signal = np.abs(self.fft_of_signal) ** 2
+        
+        if len(psd_noise) < len(psd_signal):
+            test = np.resize(psd_noise, len(psd_signal)-len(psd_noise))
+            result = np.stack((psd_noise, test), axis=0)
+            # psd_noise = np.pad(psd_noise, (0, len(psd_signal) - len(psd_noise)), mode='constant')
+        pprint(result)
+        pprint(psd_signal)
+        # Compute Wiener filter transfer function
+        H = psd_signal / (psd_signal + result + 1e-10)  # Add small value to avoid division by zero
+        pprint(H)
+        # Apply the Wiener filter
+        self.fft_of_signal = H * self.fft_of_signal
+        self.equalized_signal.amplitude_data = np.fft.ifft(self.fft_of_signal).real
+
+
+def lolabya(noise, target):
+    steps = target/len(noise)
+    new = noise
+    for i in steps:
+        new.hstak
 def hide_layout(layout):
     if layout is None:
         return
