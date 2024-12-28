@@ -13,7 +13,6 @@ import soundfile as sf
 import csv
 from SoundPlayer import AudioPlayerWidget
 import tempfile
-from pprint import pprint
 
 
 class MainWindow(QMainWindow, GUI.Ui_MainWindow):

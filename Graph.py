@@ -13,11 +13,10 @@ def set_icon(button, icon_path):
 
 class Graph():
 
-    def __init__(self, centralWidget, is_frequency_domain=False, winer = False):
+    def __init__(self, centralWidget, is_frequency_domain=False, winer = False, shading= False):
         super().__init__()
-        self.centralWidget = centralWidget
         self.plot_widget = pg.PlotWidget(centralWidget) if winer == False else CustomPlotWidget(centralWidget)
-        self.plot_widget.setBackground('#2E2E2E')
+        # self.plot_widget.setBackground('#2E2E2E')
         self.plot_widget.setFixedHeight(200)
         self.signal = None
         self.selected_data = None
@@ -30,10 +29,14 @@ class Graph():
 
         if winer:
             self.plot_widget.region.sigRegionChanged.connect(self.on_region_changed)
+        
+        if shading:
+            self.shading_region = pg.LinearRegionItem([0, 0], brush=(50, 50, 200, 50),pen="r")
+            self.shading_region.setMovable(False)
+            self.plot_widget.addItem(self.shading_region)
 
     def add_signal(self, signal, color=None):
         if signal is not None:
-            # self.remove_old_curve()
             color = "b" if color is None else color
             self.signal = signal
 
@@ -100,7 +103,6 @@ class Graph():
     def remove_old_curve(self):
         if self.curve:
             self.plot_widget.removeItem(self.curve)
-            # self.plot_widget = CustomPlotWidget(self.centralWidget)
 
     def speed_up_signal(self):
         pass
@@ -117,5 +119,13 @@ class Graph():
             selected_x = signal[0][mask]
             selected_y = signal[1][mask]
             self.selected_data = np.array([selected_x, selected_y])
+    
+    def update_shading_region(self, value):
+        """Update playback line and shading region."""
+        current_time = value/1000
+        self.shading_region.setRegion([0, current_time])
+    
+    def reset_shading_region(self):
+        self.shading_region.setRegion([0, 0])
 
 

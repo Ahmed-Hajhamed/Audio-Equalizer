@@ -132,11 +132,11 @@ class Ui_MainWindow(object):
 
         self.graphs_layout.addLayout(self.h_layout_of_button_of_wiener, 5, 0, 1, 6)
 
-        self.equalized_graph = Graph.Graph(self.centralwidget)
+        self.equalized_graph = Graph.Graph(self.centralwidget, shading=True)
         self.equalized_graph.plot_widget.setObjectName("equalized_graph")
         self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 6)
 
-        self.original_graph = Graph.Graph(self.centralwidget, is_frequency_domain= False , winer=True)
+        self.original_graph = Graph.Graph(self.centralwidget, winer=True, shading=True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)

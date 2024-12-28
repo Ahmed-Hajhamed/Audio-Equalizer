@@ -10,7 +10,7 @@ class CustomPlotWidget(pg.PlotWidget):
         self.selection_enabled = False  # Tracks if selection mode is active
 
         # Create the region but keep it hidden initially
-        self.region = pg.LinearRegionItem()
+        self.region = pg.LinearRegionItem(brush=(200, 50, 50, 50))
         self.region.setZValue(10)
         self.region.setRegion([0, 0])  # Initially set it to 0 width
         self.region.setVisible(False)  # Hide it initially
