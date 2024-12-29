@@ -4,7 +4,6 @@ from scipy.signal import spectrogram
 def compute_fft(signal_amplitudes, sampling_rate):
     fft_result =   np.fft.fft(signal_amplitudes)
     frequencies =   np.fft.fftfreq(len(signal_amplitudes), d=1 /sampling_rate)
-    print(len(fft_result) , len(frequencies))
     return fft_result, frequencies
 
 def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
@@ -19,7 +18,6 @@ def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
     significant_indices = np.where(positive_magnitude > magnitude_threshold)
     positive_freqs = positive_freqs[significant_indices]
     positive_magnitude = positive_magnitude[significant_indices]
-    print(len(positive_freqs))
     return positive_freqs, positive_magnitude
 
 def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):
@@ -84,7 +82,7 @@ def plot_spectrogram(signal, sampling_rate, canvas):
         canvas.no_label = False
         canvas.vmin, canvas.vmax = np.min(Sxx_db), np.max(Sxx_db)
 
-    print(Sxx_db.shape)
+    # print(Sxx_db.shape)
 
     canvas.axes.clear()
     cax = canvas.axes.pcolormesh(segment_times, sampled_frequencies, Sxx_db, shading='gouraud', cmap='plasma', vmin=canvas.vmin, vmax=canvas.vmax)

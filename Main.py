@@ -33,6 +33,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.fft_of_signal_of_wiener= None
         self.frequencies_of_signal = None
         self.noise_data = None
+        self.alpha_wiener_filter = 100
         self.linear_scale_radioButton.setChecked(True)
         self.spectrogram_checkbox.setChecked(False)
         self.spectrogram_checkbox.stateChanged.connect(self.hide_show_spectrogram)
@@ -47,7 +48,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.speed_down_button.clicked.connect(self.original_graph.speed_down_signal)
 
         self.confirm_weiner_filter.clicked.connect(self.filter_signal)
-        self.reset_signal_after_wiener_filter.clicked.connect(self.reset_signal_of_wiener_filter)
+        self.slider_of_alpha_wiener_filter.sliderReleased.connect(self.filter_signal)
 
         self.mode_comboBox.currentIndexChanged.connect(self.choose_mode)
         self.linear_scale_radioButton.toggled.connect(self.switch_audiogram_linear_scale)
@@ -262,45 +263,21 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
     
     def filter_signal(self):
         self.fft_of_signal = self.fft_of_signal_of_wiener
+        self.alpha_wiener_filter = self.slider_of_alpha_wiener_filter.value()
         if len(self.original_graph.selected_data[1]) > 0 :
+            print("test 267")
             noise = self.original_graph.selected_data[1]
             self.wiener_filter(noise)
 
         self.original_graph.plot_widget.region.setVisible(False)
         self.update_plots()
 
-    def reset_signal_of_wiener_filter(self):
-        pass
-
     def wiener_filter(self, noise_detected):
-        # if len(noise_detected) < len(self.original_signal.amplitude_data):
-        #     noise_detected = np.pad(noise_detected, (0, len(self.original_signal.amplitude_data) - len(noise_detected)), mode='constant')
-        #     # noise_detected = np.resize(noise_detected, self.original_signal.amplitude_data.shape)
-        
-        # Compute Power Spectral Densities (PSDs)
+        print(f"test 275 -- {self.alpha_wiener_filter}")
+        alpha = 1 if self.alpha_wiener_filter == 0 else self.alpha_wiener_filter
         psd_signal = np.abs(self.fft_of_signal_of_wiener) ** 2
-        psd_noise = np.abs(np.fft.fft(noise_detected, n=len(self.original_signal.amplitude_data))) ** 2
-        if len(psd_noise) < len(psd_signal):
-            psd_noise = np.resize(psd_noise, psd_signal.shape)
-        # Compute Wiener filter transfer function
+        psd_noise = alpha * np.abs(np.fft.fft(noise_detected, n=len(self.original_signal.amplitude_data))) ** 2
         wiener_ = psd_signal / (psd_signal + psd_noise + 1e-10)  # Add small value to avoid division by zero
-
-        # clean_signal = self.original_signal.amplitude_data - noise_detected
-
-        # # Calculate the power spectrum of the clean signal and the noise
-        # signal_power = np.abs(np.fft.fft(clean_signal))**2
-        # noise_power = np.abs(np.fft.fft(noise_detected))**2
-
-        # # Estimate the noise power as the mean of the noise power spectrum
-        # noise_power = np.mean(noise_power)
-
-        # # Calculate the signal-to-noise ratio (SNR)
-        # snr = signal_power / noise_power
-
-        # # Apply the Wiener filter to the frequency domain
-        # wiener_ = 1 / (1 + 1 / snr)
-
-        # Apply the Wiener filter
         self.fft_of_signal = wiener_ * self.fft_of_signal
         self.equalized_signal.amplitude_data = np.fft.ifft(self.fft_of_signal).real
 

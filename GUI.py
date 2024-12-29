@@ -125,10 +125,11 @@ class Ui_MainWindow(object):
         self.confirm_weiner_filter.setVisible(False)
         self.h_layout_of_button_of_wiener.addWidget(self.confirm_weiner_filter)
 
-        self.reset_signal_after_wiener_filter = QtWidgets.QPushButton(self.centralwidget)
-        self.reset_signal_after_wiener_filter.setObjectName("reset_signal_after_wiener_filter")
-        self.reset_signal_after_wiener_filter.setVisible(False)
-        self.h_layout_of_button_of_wiener.addWidget(self.reset_signal_after_wiener_filter)
+        self.slider_of_alpha_wiener_filter = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.slider_of_alpha_wiener_filter.setRange(0,1000)
+        self.slider_of_alpha_wiener_filter.setObjectName("slider_of_alpha_wiener_filter")
+        self.slider_of_alpha_wiener_filter.setVisible(False)
+        self.h_layout_of_button_of_wiener.addWidget(self.slider_of_alpha_wiener_filter)
 
         self.graphs_layout.addLayout(self.h_layout_of_button_of_wiener, 5, 0, 1, 6)
 
@@ -244,7 +245,7 @@ class Ui_MainWindow(object):
         self.speed_down_button.setText(_translate("MainWindow", "Speed Down"))
         self.zoom_in_button.setText(_translate("MainWindow", "Zoom In"))
         self.confirm_weiner_filter.setText(_translate("MainWindow", "Confirm"))
-        self.reset_signal_after_wiener_filter.setText(_translate("MainWindow", "Reset Signal"))
+        # self.slider_of_alpha_wiener_filter.setText(_translate("MainWindow", "Reset Signal"))
         self.equalized_graph_label.setText(_translate("MainWindow", "Equalized Audio"))
         self.frequency_plot_label.setText(_translate("MainWindow", "TextLabel"))
 
