@@ -13,9 +13,9 @@ def set_icon(button, icon_path):
 
 class Graph():
 
-    def __init__(self, centralWidget, is_frequency_domain=False, winer = False, shading= False):
+    def __init__(self, is_frequency_domain=False, winer = False, shading= False):
         super().__init__()
-        self.plot_widget = pg.PlotWidget(centralWidget) if winer == False else CustomPlotWidget(centralWidget)
+        self.plot_widget = pg.PlotWidget() if winer == False else CustomPlotWidget()
         self.plot_widget.setBackground('#2E2E2E')
         self.plot_widget.setFixedHeight(200)
         self.signal = None
@@ -88,16 +88,15 @@ class Graph():
         """Set the plot limits based on the loaded data."""
         if len(self.signal[0])>0:
             x_max = self.signal[0][-1]
+            y_min = min(self.signal[1])
+            y_max = max(self.signal[1])
 
-            # y_min = min(self.signal[1])
-            # y_max = max(self.signal[1])
+            y_min = y_min - y_min * 0.05 if y_min > 0 else y_min + y_min * 0.05
 
-            # y_min = y_min - y_min * 0.05 if y_min > 0 else y_min + y_min * 0.05
-
-            # self.plot_widget.setLimits(
-            #     xMin=-0.1, xMax=x_max + 0.1,
-            #     yMin=y_min, yMax=y_max + y_max * 0.05
-            # )
+            self.plot_widget.setLimits(
+                xMin=-0.1, xMax=x_max + 0.1,
+                yMin=y_min, yMax=y_max + y_max * 0.05
+            )
             
 
     def remove_old_curve(self):

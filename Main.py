@@ -45,7 +45,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.speed_up_button.clicked.connect(self.original_graph.speed_up_signal)
         self.speed_down_button.clicked.connect(self.original_graph.speed_down_signal)
 
-        self.confirm_weiner_filter.clicked.connect(self.filter_signal)
+        self.confirm_weiner_filter_button.clicked.connect(self.filter_signal)
         self.slider_of_alpha_wiener_filter.sliderReleased.connect(self.filter_signal)
 
         self.mode_comboBox.currentIndexChanged.connect(self.choose_mode)
@@ -63,11 +63,11 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             file_path = self.signal_file_path
         else:
             file_path, _ = QFileDialog.getOpenFileName(self, "Select File", "audio", "All Files (*);;Text Files (*.txt)")
+            
         if file_path:
             self.fft_of_signal_of_wiener = None
             self.signal_file_path=file_path
             self.original_signal= MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
-            # self.equalized_signal= copy.deepcopy(self.original_signal)
             self.equalized_signal =  MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
             self.file_name_label.setText(self.original_signal.signal_name)
 
@@ -76,10 +76,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.modified_fft = self.fft_of_signal.copy()
             self.band_edges = list(self.original_signal.frquencies_ranges.values())
             self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
-            
-            # Mode.plot_spectrogram(self.original_signal.amplitude_data,
-            #                    self.original_signal.sampling_rate, self.original_spectrogram)
-            
+
             self.original_graph.remove_old_curve()
             self.equalized_graph.remove_old_curve()
             self.choose_mode()
@@ -109,7 +106,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
     def save_signal(self):
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getSaveFileName(
-        None,  "Save Audio File", "", "Audio Wave (*.wav);;All Files (*)", options=options )
+                None,  "Save Audio File", "audio", "Audio Wave (*.wav);;All Files (*)", options=options )
         sf.write(file_path, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
 
     def slider_creator(self, mode_name="Uniform Mode"):
@@ -126,7 +123,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.slider_values.append(slider.value())
             slider.valueChanged.connect(lambda value, idx=i: self.apply_gain(value, idx))
             label = QLabel(str(self.names[i]))
-            label.setObjectName("slider_1_label")
             label.setFixedHeight(30)
             band_layout.addWidget(label, 1, i, 1, 1)
             band_layout.addWidget(slider, 0, i, 1, 1)
@@ -235,7 +231,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.fft_of_signal = self.fft_of_signal_of_wiener
         self.alpha_wiener_filter = self.slider_of_alpha_wiener_filter.value()
         if len(self.original_graph.selected_data[1]) > 0 :
-            print("test 267")
             noise = self.original_graph.selected_data[1]
             self.wiener_filter(noise)
 
