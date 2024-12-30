@@ -22,9 +22,9 @@ def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
 
 def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):
     fft_result, frequencies = fft_of_signal, frequencies_of_signal
-    modified_fft = fft_result
+    modified_fft = fft_result.copy()
     for slider_idx, slider_value in enumerate(slider_values):
-        slider_value = 4 ** (slider_value/50)
+        slider_value = 16 ** (slider_value/50)
         low, high = band_edges[slider_idx][0], band_edges[slider_idx][1]
         band_mask = np.where((frequencies >= low) & (frequencies < high))
         modified_fft[band_mask] *= slider_value

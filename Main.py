@@ -18,15 +18,16 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.setupUi(self)
         self.current_mode_name = 'Uniform Mode'
         self.signal_file_path= 'audio/alarm_beep.wav'
-        self.sliders_layout=None
+        self.sliders_layout = None
         self.gain = None
-        self.original_signal=None
-        self.equalized_signal=None
-        self.band_edges= None
-        self.frequency_domain=None
+        self.original_signal = None
+        self.equalized_signal = None
+        self.band_edges = None
+        self.frequency_domain = None
         self.number_of_sliders = 10
         self.slider_values = []
         self.fft_of_signal = None
+        self.modified_fft = None
         self.fft_of_signal_of_wiener= None
         self.frequencies_of_signal = None
         self.noise_data = None
@@ -72,7 +73,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 
             self.fft_of_signal, self.frequencies_of_signal = Mode.compute_fft(self.original_signal.amplitude_data,
                                                                                self.original_signal.sampling_rate)
-            
+            self.modified_fft = self.fft_of_signal.copy()
             self.band_edges = list(self.original_signal.frquencies_ranges.values())
             self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
             
@@ -87,15 +88,15 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             Mode.plot_spectrogram(self.original_signal.amplitude_data,
                                 self.original_signal.sampling_rate, self.original_spectrogram)
             self.original_media_player.update_song(self.signal_file_path)
+            self.set_uniform_frequency_ranges()
             self.update_plots()
 
     def update_plots(self):
-        self.set_uniform_frequency_ranges()
         self.equalized_graph.add_signal(np.array([self.equalized_signal.time_data, self.equalized_signal.amplitude_data]))
         Audiogram.plotAudiogram(self.equalized_signal.amplitude_data, 
                                 self.equalized_signal.sampling_rate, self.audiogram_plot)
         
-        self.frequency_domain = Mode.get_full_frequency_domain(self.fft_of_signal, self.frequencies_of_signal)
+        self.frequency_domain = Mode.get_full_frequency_domain(self.modified_fft, self.frequencies_of_signal)
         self.frequency_plot.remove_old_curve()
         self.frequency_plot.add_signal(self.frequency_domain, color = 'r')
         
@@ -143,7 +144,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
                 
     def apply_gain(self, slider_value, slider_index):
         self.slider_values[slider_index] = slider_value
-        self.equalized_signal.amplitude_data, self.fft_of_signal = Mode.apply_gain(self.fft_of_signal,
+        self.equalized_signal.amplitude_data, self.modified_fft= Mode.apply_gain(self.fft_of_signal,
                                                          self.frequencies_of_signal, self.slider_values, self.band_edges)
         self.equalized_signal.time_data = np.linspace(0, len(self.equalized_signal.amplitude_data)/ self.equalized_signal.sampling_rate,
                                                        len(self.equalized_signal.amplitude_data))
@@ -221,14 +222,14 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.equlized_media_player.update_song(temp.name)
 
     def set_uniform_frequency_ranges(self):
-        if self.current_mode_name=='Uniform Mode':
+        if self.current_mode_name == 'Uniform Mode':
             frequencies= self.frequencies_of_signal
-            max_freq=np.max(frequencies)
-            start,end=0,max_freq/10
+            max_freq = np.max(frequencies)
+            start, end = 0, max_freq/10
             for i in range (1, 11):
-                self.original_signal.frquencies_ranges[i]=[int(start), int(end)]
-                start+=max_freq/10
-                end+=max_freq/10 
+                self.original_signal.frquencies_ranges[i]=[(start), (end)]
+                start += max_freq/10
+                end += max_freq/10 
     
     def filter_signal(self):
         self.fft_of_signal = self.fft_of_signal_of_wiener
@@ -249,7 +250,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.fft_of_signal = wiener_ * self.fft_of_signal
         self.equalized_signal.amplitude_data = np.fft.ifft(self.fft_of_signal).real
 
-
 def hide_layout(layout):
     if layout is None:
         return
@@ -265,7 +265,6 @@ def show_layout(layout):
         widget = layout.itemAt(i).widget()
         if widget is not None:
             widget.show()  # Show each widget
-
     
 app = QApplication(sys.argv)
 window = MainWindow()

@@ -58,7 +58,6 @@ class Ui_MainWindow(object):
         self.controls_layout.addWidget(self.load_button, 1, 0, 1, 1)
 
         self.frequency_scale_label = QtWidgets.QLabel(self.centralwidget)
-        self.frequency_scale_label.setObjectName("frequency_scale_label")
         self.controls_layout.addWidget(self.frequency_scale_label, 5, 0, 1, 2)
 
         self.mode_comboBox = QtWidgets.QComboBox(self.centralwidget)
@@ -218,16 +217,9 @@ class Ui_MainWindow(object):
 
         self.original_media_player.media_player.positionChanged.connect(self.original_graph.update_shading_region)
         self.equlized_media_player.media_player.positionChanged.connect(self.equalized_graph.update_shading_region)
-        
+
         self.gridLayout_4.addLayout(self.graphs_layout, 0, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        # self.menubar = QtWidgets.QMenuBar(MainWindow)
-        # self.menubar.setGeometry(QtCore.QRect(0, 0, 1256, 26))
-        # self.menubar.setObjectName("menubar")
-        # MainWindow.setMenuBar(self.menubar)
-        # self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        # self.statusbar.setObjectName("statusbar")
-        # MainWindow.setStatusBar(self.statusbar)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
