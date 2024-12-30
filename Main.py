@@ -11,7 +11,6 @@ import MySignal
 import Audiogram
 import soundfile as sf
 import csv
-from SoundPlayer import AudioPlayerWidget
 import tempfile
 
 
@@ -194,9 +193,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.original_graph.plot_widget.set_selection_mode(False)
             self.fft_of_signal = self.fft_of_signal_of_wiener if self.fft_of_signal_of_wiener is not None else self.fft_of_signal
             
-        
         self.update_plots()
-        # self.update_audio_palyer()
 
     def hide_show_spectrogram(self):
         widgets = [self.original_spectrogram, self.equalized_spectrogram,
@@ -239,18 +236,9 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.frequency_plot_label.setText("Audiogram Scale")
 
     def update_audio_palyer(self):
-        try:
-            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
-                sf.write(temp.name, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
-            self.equlized_media_player.update_song(temp.name)
-            # self.original_media_player =AudioPlayerWidget(audio_file=self.signal_file_path)
-            # self.equlized_media_player =AudioPlayerWidget(audio_file=temp.name)
-            # self.controls_layout.addWidget(self.original_media_player, 8, 0, 1, 2)
-            # self.controls_layout.addWidget(self.equlized_media_player, 9, 0, 1, 2)
-            # self.original_media_player.set_other_players([self.equlized_media_player])
-            # self.equlized_media_player.set_other_players([self.original_media_player])
-        except:
-            print("update_audio_palyer line 268")
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
+            sf.write(temp.name, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
+        self.equlized_media_player.update_song(temp.name)
 
     def set_uniform_frequency_ranges(self):
         if self.current_mode_name=='Uniform Mode':
