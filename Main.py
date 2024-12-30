@@ -1,8 +1,7 @@
 import sys
 import copy
-from matplotlib.mlab import psd
 import numpy as np
-from PyQt5.QtWidgets import QApplication, QMainWindow,QFileDialog, QSlider, QLabel,QGridLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow,QFileDialog, QSlider, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
 import GUI
 from qt_material import apply_stylesheet
@@ -10,7 +9,6 @@ import Mode
 import MySignal
 import Audiogram
 import soundfile as sf
-import csv
 import tempfile
 
 
@@ -68,7 +66,8 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.fft_of_signal_of_wiener = None
             self.signal_file_path=file_path
             self.original_signal= MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
-            self.equalized_signal=copy.deepcopy(self.original_signal)
+            # self.equalized_signal= copy.deepcopy(self.original_signal)
+            self.equalized_signal =  MySignal.Signal(mode=self.current_mode_name, file_path=self.signal_file_path)
             self.file_name_label.setText(self.original_signal.signal_name)
 
             self.fft_of_signal, self.frequencies_of_signal = Mode.compute_fft(self.original_signal.amplitude_data,
@@ -83,7 +82,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             self.original_graph.remove_old_curve()
             self.equalized_graph.remove_old_curve()
             self.choose_mode()
-            self.original_graph.add_signal(signal= [self.original_signal.time_data,self.original_signal.amplitude_data])
+            self.original_graph.add_signal(signal= [self.original_signal.time_data, self.original_signal.amplitude_data])
 
             Mode.plot_spectrogram(self.original_signal.amplitude_data,
                                 self.original_signal.sampling_rate, self.original_spectrogram)
@@ -107,22 +106,10 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.update_audio_palyer()
         
     def save_signal(self):
-        if self.current_mode_name == 'ECG Abnormalities':
-            options = QFileDialog.Options()
-            file_path, _ = QFileDialog.getSaveFileName(
-            None,  "Save CSV File", "", "CSV Files (*.csv);;All Files (*)", options=options )
-
-            with open(file_path, mode='w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(["List1", "List2"])
-                for item1, item2 in zip(self.equalized_signal.time_data, self.equalized_signal.amplitude_data):
-                    writer.writerow([item1, item2])
-        else:
-            options = QFileDialog.Options()
-            file_path, _ = QFileDialog.getSaveFileName(
-            None,  "Save Audio File", "", "Audio Wave (*.wav);;All Files (*)", options=options )
-            sf.write(file_path, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
-
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getSaveFileName(
+        None,  "Save Audio File", "", "Audio Wave (*.wav);;All Files (*)", options=options )
+        sf.write(file_path, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
 
     def slider_creator(self, mode_name="Uniform Mode"):
         self.number_of_sliders = 10 if mode_name == "Uniform Mode" else 4
@@ -140,8 +127,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             label = QLabel(str(self.names[i]))
             label.setObjectName("slider_1_label")
             label.setFixedHeight(30)
-            band_layout.addWidget(label, 1
-                                  , i, 1, 1)
+            band_layout.addWidget(label, 1, i, 1, 1)
             band_layout.addWidget(slider, 0, i, 1, 1)
         return band_layout
     
@@ -185,7 +171,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             hide_layout(self.sliders_layout)
             show_layout(self.h_layout_of_button_of_wiener)
 
-        
         if self.current_mode_name == "Wiener Filter" :
             self.original_graph.plot_widget.set_selection_mode(True)
             self.fft_of_signal_of_wiener = self.fft_of_signal
@@ -200,7 +185,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
                     self.original_spectrogram_label, self.equalized_spectrogram_label, self.line_2]
         for widget in widgets:
             if self.spectrogram_checkbox.isChecked():
-                # show_layout(widget)
                 widget.show()
                 widget.setVisible(True)
                 self.graphs_layout.removeWidget(self.original_graph.plot_widget)
@@ -208,10 +192,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
                 self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 6)
                 self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 6)
             else:
-                # hide_layout(widget)
-                # self.graphs_layout.removeWidget(widget)
-                # widget.hide()
-                # widget.setVisible(False)
                 self.original_spectrogram.setVisible(False)
                 self.equalized_spectrogram.setVisible(False)
                 self.original_spectrogram_label.setVisible(False)
@@ -246,7 +226,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
             max_freq=np.max(frequencies)
             start,end=0,max_freq/10
             for i in range (1, 11):
-                self.original_signal.frquencies_ranges[i]=[start,end]
+                self.original_signal.frquencies_ranges[i]=[int(start), int(end)]
                 start+=max_freq/10
                 end+=max_freq/10 
     
@@ -262,7 +242,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.update_plots()
 
     def wiener_filter(self, noise_detected):
-        print(f"test 275 -- {self.alpha_wiener_filter}")
         alpha = 1 if self.alpha_wiener_filter == 0 else self.alpha_wiener_filter
         psd_signal = np.abs(self.fft_of_signal_of_wiener) ** 2
         psd_noise = alpha * np.abs(np.fft.fft(noise_detected, n=len(self.original_signal.amplitude_data))) ** 2
@@ -271,11 +250,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         self.equalized_signal.amplitude_data = np.fft.ifft(self.fft_of_signal).real
 
 
-def lolabya(noise, target):
-    steps = target/len(noise)
-    new = noise
-    for i in steps:
-        new.hstak
 def hide_layout(layout):
     if layout is None:
         return

@@ -216,6 +216,9 @@ class Ui_MainWindow(object):
         self.line_3.setObjectName("line_3")
         self.graphs_layout.addWidget(self.line_3, 5, 6, 1, 1)
 
+        self.original_media_player.media_player.positionChanged.connect(self.original_graph.update_shading_region)
+        self.equlized_media_player.media_player.positionChanged.connect(self.equalized_graph.update_shading_region)
+        
         self.gridLayout_4.addLayout(self.graphs_layout, 0, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         # self.menubar = QtWidgets.QMenuBar(MainWindow)

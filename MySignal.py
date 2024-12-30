@@ -33,17 +33,8 @@ class Signal:
     def load_signal(self):
         """Load signal data from a CSV, MP3 or mav file."""
         self.signal_name = os.path.splitext(os.path.basename(self.file_path))[0]
-        # if self.mode == 'Music' or  self.mode =='Animal Sounds' or  self.mode =='Uniform Mode':
         self.frquencies_ranges = available_frequencies[self.mode]
         signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100)
         self.duration = librosa.get_duration(y=signal_data, sr=self.sampling_rate)
         self.time_data = np.linspace(0, len(signal_data)/ self.sampling_rate, len(signal_data))
         self.amplitude_data = signal_data
-
-
-        # elif self.mode == 'ECG Abnormalities':
-        #     self.frquencies_ranges = available_frequencies[self.mode]
-        #     signal_data = pd.read_csv(self.file_path)
-        #     self.time_data = signal_data.iloc[:, 0].values
-        #     self.amplitude_data = signal_data.iloc[:, 1].values
-        #     self.sampling_rate = 1 / (self.time_data[1] - self.time_data[0])

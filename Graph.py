@@ -127,5 +127,3 @@ class Graph():
     
     def reset_shading_region(self):
         self.shading_region.setRegion([0, 0])
-
-

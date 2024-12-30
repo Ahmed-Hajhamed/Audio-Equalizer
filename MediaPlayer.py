@@ -25,7 +25,6 @@ class AudioPlayerWidget(QWidget):
         self.slider.sliderReleased.connect(self.seek_position)
 
         self.time_label = QLabel("0:00")
-
         self.media_player.positionChanged.connect(self.update_slider)
         self.media_player.durationChanged.connect(self.update_duration)
 
