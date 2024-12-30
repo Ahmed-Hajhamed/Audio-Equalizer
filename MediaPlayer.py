@@ -56,6 +56,7 @@ class AudioPlayerWidget(QWidget):
         self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(file_path)))
         self.time_label.setText("0:00")
         self.slider.setValue(0)
+        set_icon(self.play_button, "icons\play.png")
         self.is_paused = True
         self.is_seeking = False
 
