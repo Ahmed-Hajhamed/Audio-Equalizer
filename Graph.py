@@ -16,7 +16,7 @@ class Graph():
     def __init__(self, centralWidget, is_frequency_domain=False, winer = False, shading= False):
         super().__init__()
         self.plot_widget = pg.PlotWidget(centralWidget) if winer == False else CustomPlotWidget(centralWidget)
-        # self.plot_widget.setBackground('#2E2E2E')
+        self.plot_widget.setBackground('#2E2E2E')
         self.plot_widget.setFixedHeight(200)
         self.signal = None
         self.selected_data = None

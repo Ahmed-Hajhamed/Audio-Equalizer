@@ -64,7 +64,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         if self.original_signal is None:
             file_path = self.signal_file_path
         else:
-            file_path, _ = QFileDialog.getOpenFileName(self, "Select File", "", "All Files (*);;Text Files (*.txt)")
+            file_path, _ = QFileDialog.getOpenFileName(self, "Select File", "audio", "All Files (*);;Text Files (*.txt)")
         if file_path:
             self.fft_of_signal_of_wiener = None
             self.signal_file_path=file_path
@@ -88,7 +88,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 
             Mode.plot_spectrogram(self.original_signal.amplitude_data,
                                 self.original_signal.sampling_rate, self.original_spectrogram)
-                
+            self.original_media_player.update_song(self.signal_file_path)
             self.update_plots()
 
     def update_plots(self):
@@ -242,12 +242,13 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         try:
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
                 sf.write(temp.name, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
-            self.original_media_player =AudioPlayerWidget(audio_file=self.signal_file_path)
-            self.equlized_media_player =AudioPlayerWidget(audio_file=temp.name)
-            self.controls_layout.addWidget(self.original_media_player, 8, 0, 1, 2)
-            self.controls_layout.addWidget(self.equlized_media_player, 9, 0, 1, 2)
-            self.original_media_player.set_other_players([self.equlized_media_player])
-            self.equlized_media_player.set_other_players([self.original_media_player])
+            self.equlized_media_player.update_song(temp.name)
+            # self.original_media_player =AudioPlayerWidget(audio_file=self.signal_file_path)
+            # self.equlized_media_player =AudioPlayerWidget(audio_file=temp.name)
+            # self.controls_layout.addWidget(self.original_media_player, 8, 0, 1, 2)
+            # self.controls_layout.addWidget(self.equlized_media_player, 9, 0, 1, 2)
+            # self.original_media_player.set_other_players([self.equlized_media_player])
+            # self.equlized_media_player.set_other_players([self.original_media_player])
         except:
             print("update_audio_palyer line 268")
 

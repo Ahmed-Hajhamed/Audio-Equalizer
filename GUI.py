@@ -4,6 +4,7 @@ import Graph
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import MediaPlayer
 
 # Define a custom style for gray background
 gray_style = {
@@ -44,6 +45,13 @@ class Ui_MainWindow(object):
 
         self.controls_layout = QtWidgets.QGridLayout()
         self.controls_layout.setObjectName("controls_layout")
+
+        self.original_media_player =MediaPlayer.AudioPlayerWidget()
+        self.equlized_media_player =MediaPlayer.AudioPlayerWidget()
+        self.controls_layout.addWidget(self.original_media_player, 8, 0, 1, 2)
+        self.controls_layout.addWidget(self.equlized_media_player, 9, 0, 1, 2)
+        self.original_media_player.set_other_players([self.equlized_media_player])
+        self.equlized_media_player.set_other_players([self.original_media_player])
 
         self.load_button = QtWidgets.QPushButton(self.centralwidget)
         self.load_button.setObjectName("load_button")
