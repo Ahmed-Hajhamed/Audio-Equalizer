@@ -1,7 +1,7 @@
 import sys
 import copy
 import numpy as np
-from PyQt5.QtWidgets import QApplication, QMainWindow,QFileDialog, QSlider, QLabel, QGridLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QSlider, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
 import GUI
 from qt_material import apply_stylesheet
@@ -17,7 +17,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.current_mode_name = 'Uniform Mode'
-        self.signal_file_path= 'audio/alarm_beep.wav'
+        self.signal_file_path= 'audio\\A.wav'
         self.sliders_layout = None
         self.gain = None
         self.original_signal = None

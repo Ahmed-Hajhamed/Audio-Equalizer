@@ -11,7 +11,7 @@ def get_full_frequency_domain(fft_of_signal, frequencies_of_signal):
     magnitude = np.abs(fft_of_signal)
     positive_magnitude = magnitude[:len(magnitude) // 2]
 
-    magnitude_threshold_ratio = 0.005
+    magnitude_threshold_ratio = 0.01
     max_magnitude = np.max(positive_magnitude)
     magnitude_threshold = magnitude_threshold_ratio * max_magnitude
 

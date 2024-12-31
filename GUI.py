@@ -24,6 +24,7 @@ gray_style = {
 
 # Apply the custom style
 plt.style.use(gray_style)
+
 class SpectrogramPlot(FigureCanvas):
     def __init__(self, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
@@ -53,6 +54,7 @@ class Ui_MainWindow(object):
         self.choose_mode_label = QtWidgets.QLabel("Select Mode:")
         self.spectrogram_checkbox = QtWidgets.QCheckBox("Spectrogram")
         self.file_name_label = QtWidgets.QLabel("File Name")
+        self.file_name_label.setWordWrap(True)
         self.audiogram_radioButton = QtWidgets.QRadioButton("Audiogram")
         self.linear_scale_radioButton = QtWidgets.QRadioButton("Linear Scale")
         self.save_button = QtWidgets.QPushButton("Save")
@@ -75,8 +77,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         self.equalized_graph = Graph.Graph(shading=True)
 
-        self.audiogram_plot = SpectrogramPlot()
-        self.audiogram_plot.setMaximumWidth(600)
+        self.audiogram_plot = SpectrogramPlot(width= 3, height=2)
 
         self.frequency_plot = Graph.Graph(is_frequency_domain= True)
         self.frequency_plot.plot_widget.setMaximumWidth(600)

@@ -33,7 +33,7 @@ class Signal:
         """Load signal data from a CSV, MP3 or mav file."""
         self.signal_name = os.path.splitext(os.path.basename(self.file_path))[0]
         self.frquencies_ranges = available_frequencies[self.mode]
-        signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100)
+        signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100, duration= 30)
         self.duration = librosa.get_duration(y=signal_data, sr=self.sampling_rate)
         self.time_data = np.linspace(0, len(signal_data)/ self.sampling_rate, len(signal_data))
         self.amplitude_data = signal_data
