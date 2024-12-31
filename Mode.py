@@ -29,6 +29,7 @@ def apply_gain(fft_of_signal, frequencies_of_signal, slider_values, band_edges):
         low, high = band_edges[slider_idx][0], band_edges[slider_idx][1]
         band_mask = np.where((frequencies >= low) & (frequencies < high))
         modified_fft[band_mask] *= slider_value
+        modified_fft[-band_mask[0]] *= slider_value
     reconstructed_signal =  np.fft.ifft(modified_fft).real
     return reconstructed_signal, modified_fft
 
