@@ -64,7 +64,7 @@ class Ui_MainWindow(object):
         self.controls_layout.addWidget(self.frequency_scale_label, 5, 0, 1, 2)
 
         self.mode_comboBox = QtWidgets.QComboBox(self.centralwidget)
-        self.mode_comboBox.addItems(["Uniform Mode", "Music", "Animal Sounds", "Wiener Filter"])
+        self.mode_comboBox.addItems(["Uniform Mode", "Vocals and Music", "Animals and Music", "Wiener Filter"])
         self.mode_comboBox.setStyleSheet(""" QComboBox { color: 'white';}
                                                     QComboBox QAbstractItemView {color: 'white'; }""")
         

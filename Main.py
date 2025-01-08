@@ -110,7 +110,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
         sf.write(file_path, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
 
     def slider_creator(self, mode_name="Uniform Mode"):
-        self.number_of_sliders = 10 if mode_name == "Uniform Mode" else 4
+        self.number_of_sliders = 10 if mode_name == "Uniform Mode" else 5
         band_layout = QGridLayout()
         self.gain = [1] * self.number_of_sliders
         self.slider_values.clear()
