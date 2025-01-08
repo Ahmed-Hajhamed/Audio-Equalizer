@@ -8,18 +8,22 @@ An advanced **Audio Equalizer Application** designed to enhance your audio proce
 - **Uniform Mode**:
   - Divides the audio signal into 10 uniform frequency ranges.
   - Allows users to adjust the amplitude of each range individually.
+![Screenshot 2025-01-08 091156](https://github.com/user-attachments/assets/d7a4a5ee-b330-490b-8521-1224f09e183b)
 
 - **Animals and Music Mode**:
   - Focuses on three animal voices and two musical instruments.
   - Allows users to equalize specific components in the audio.
+![Screenshot 2025-01-08 091309](https://github.com/user-attachments/assets/8865d2e5-5fbd-4a6f-9c52-380c16640ee4)
 
 - **Vocals and Music Mode**:
   - Targets two alphabetical letters (vocals) and three musical instruments.
   - Enables separate equalization for vocals and instruments in the same audio.
+![Screenshot 2025-01-08 091457](https://github.com/user-attachments/assets/ff7975f3-de6e-4110-bbfa-7fe1c433937a)
 
 - **Wiener Filter Mode**:
   - Helps filter out noise by analyzing silent periods in the audio.
-  - Allows users to select and filter noise effectively.
+  - Allows users to select and filter noise using mouse drag.
+![Screenshot 2025-01-08 091754](https://github.com/user-attachments/assets/9e0c637c-1f55-4a98-adc1-352e5ea5629e)
 
 ### 2. **Visualizations**
 - **Spectrograms**:
@@ -53,16 +57,13 @@ An advanced **Audio Equalizer Application** designed to enhance your audio proce
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/audio-equalizer.git
+   git clone https://github.com/Ahmed-Hajhamed/Audio-Equalizer.git
    ```
-2. Navigate to the project directory:
-   ```bash
-   cd audio-equalizer
-   ```
-3. Install the required dependencies:
+2. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
+3. Run Main.py
 
 ## Dependencies
 - Python 3.x
@@ -76,14 +77,7 @@ An advanced **Audio Equalizer Application** designed to enhance your audio proce
 ## Contributing
 Contributions are welcome! If you have any ideas or improvements, please open an issue or submit a pull request.
 
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Screenshots
-(Include screenshots of the app interface and visualizations here)
-
 ## Contact
 For any queries, feel free to reach out:
-- **Email**: yourname@example.com
-- **GitHub**: [YourUsername](https://github.com/yourusername)
+- **GitHub**: [Ahmed-Hajhamed](https://github.com/Ahmed-Hajhamed)
 
