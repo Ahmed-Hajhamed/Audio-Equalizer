@@ -71,7 +71,7 @@ class Ui_MainWindow(object):
         self.original_spectrogram = SpectrogramPlot()
         self.equalized_spectrogram = SpectrogramPlot()
 
-        self.original_graph = Graph.Graph(winer=True, shading=True)
+        self.original_graph = Graph.Graph(wiener=True, shading=True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
@@ -79,18 +79,16 @@ class Ui_MainWindow(object):
 
         self.audiogram_plot = SpectrogramPlot(width= 3, height=2)
 
-        self.frequency_plot = Graph.Graph(is_frequency_domain= True)
+        self.frequency_plot = Graph.Graph()
         self.frequency_plot.plot_widget.setMaximumWidth(600)
         self.frequency_plot_label = QtWidgets.QLabel("Frequency Plot")
         
         self.original_graph_label = QtWidgets.QLabel("Original Audio")
         self.speed_down_button = QtWidgets.QPushButton("Speed Down")
         self.equalized_graph_label = QtWidgets.QLabel("Equalized Audio")
-        self.reset_button = QtWidgets.QPushButton("Reset")
         self.zoom_in_button = QtWidgets.QPushButton("Zoom In")
         self.zoom_out_button = QtWidgets.QPushButton("Zoom Out")
         self.equalized_spectrogram_label = QtWidgets.QLabel("Equalized Spectrogram")
-        self.play_pause_button = QtWidgets.QPushButton("Play")
         self.speed_up_button = QtWidgets.QPushButton("Speed Up")
         self.original_spectrogram_label = QtWidgets.QLabel("Original Audio Spectrogam")
         self.line_2 = create_line()
@@ -116,19 +114,17 @@ class Ui_MainWindow(object):
 
         self.h_layout_of_button_of_wiener.addWidget(self.confirm_weiner_filter_button)
         self.h_layout_of_button_of_wiener.addWidget(self.slider_of_alpha_wiener_filter)
-        
-        self.graphs_layout.addWidget(self.reset_button, 4, 1, 1, 1)
+
         self.graphs_layout.addWidget(self.equalized_spectrogram_label, 2, 7, 1, 1)
-        self.graphs_layout.addWidget(self.play_pause_button, 4, 0, 1, 1)
-        self.graphs_layout.addWidget(self.speed_up_button, 4, 5, 1, 1)
         self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 6)
         self.graphs_layout.addWidget(self.original_spectrogram_label, 0, 7, 1, 1)
         self.graphs_layout.addWidget(self.original_spectrogram, 1, 7, 1, 1)
         self.graphs_layout.addWidget(self.equalized_spectrogram, 3, 7, 1, 1)
         self.graphs_layout.addWidget(self.original_graph_label, 0, 0, 1, 6)
-        self.graphs_layout.addWidget(self.zoom_out_button, 4, 3, 1, 1)
-        self.graphs_layout.addWidget(self.speed_down_button, 4, 4, 1, 1)
-        self.graphs_layout.addWidget(self.zoom_in_button, 4, 2, 1, 1)
+        self.graphs_layout.addWidget(self.zoom_out_button, 4, 1, 1, 1)
+        self.graphs_layout.addWidget(self.speed_down_button, 4, 2, 1, 1)
+        self.graphs_layout.addWidget(self.zoom_in_button, 4, 0, 1, 1)
+        self.graphs_layout.addWidget(self.speed_up_button, 4, 3, 1, 1)
         self.graphs_layout.addWidget(self.equalized_graph_label, 2, 0, 1, 6)
         self.graphs_layout.addWidget(self.frequency_plot.plot_widget, 5, 7, 1, 1)
         self.graphs_layout.addWidget(self.audiogram_plot, 5, 7, 1, 1)

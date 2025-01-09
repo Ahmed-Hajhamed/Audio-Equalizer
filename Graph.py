@@ -11,25 +11,19 @@ def set_icon(button, icon_path):
     button.setFixedSize(30, 30)
     button.setStyleSheet("border: none; background-color: none;")
 
-class Graph():
-
-    def __init__(self, is_frequency_domain=False, winer = False, shading= False):
+class Graph:
+    def __init__(self, wiener = False, shading= False):
         super().__init__()
-        self.plot_widget = pg.PlotWidget() if winer == False else CustomPlotWidget()
+        self.plot_widget = pg.PlotWidget() if wiener == False else CustomPlotWidget()
         self.plot_widget.setBackground('#2E2E2E')
         self.plot_widget.setFixedHeight(200)
         self.signal = None
         self.selected_data = None
-        self.current_index = 0
-        self.current_index_increment = 10
-        self.is_paused = False
-        self.is_off = False
-        self.is_frequency_domain=is_frequency_domain
         self.curve = None
 
-        if winer:
+        if wiener:
             self.plot_widget.region.sigRegionChanged.connect(self.on_region_changed)
-        
+
         if shading:
             self.shading_region = pg.LinearRegionItem([0, 0], brush=(50, 50, 200, 50),pen="r")
             self.shading_region.setMovable(False)
@@ -39,34 +33,18 @@ class Graph():
         if signal is not None:
             color = "b" if color is None else color
             self.signal = signal
-
             self.plot_widget.removeItem(self.curve)
             self.curve = self.plot_widget.plot(signal[0], signal[1], pen=color)        
-            
             self.set_plot_limits()
 
     def update_plot(self):
         if self.signal is not None:
             self.curve.setData(self.signal[0], self.signal[1], pen="green")
 
-
-    def play_pause(self, play_pause_button):
-        if self.is_paused:
-            # set_icon(play_pause_button, "icons\pause.png")
-            play_pause_button.setText("PAUSE")
-        else:
-            # set_icon(play_pause_button, "icons/play.png")
-            play_pause_button.setText("PLAY")
-        self.is_paused = not self.is_paused
-
-    def rewind_signal(self):
-        pass
-
     def off_signal(self):
         self.graph_1.setLimits(xMin=0, xMax=2, yMin=-2, yMax=2)
 
     def zoom_in(self):
-
         x_range = self.plot_widget.viewRange()[0]
         y_range = self.plot_widget.viewRange()[1]
 
@@ -86,19 +64,16 @@ class Graph():
 
     def set_plot_limits(self):
         """Set the plot limits based on the loaded data."""
-        if len(self.signal[0])>0:
-            x_max = self.signal[0][-1]
-            y_min = min(self.signal[1])
-            y_max = max(self.signal[1])
+        if len(self.signal[0]) > 0:
+            x_max = truncate_to_3_decimals(self.signal[0][-1]) # Take 3 decimals to wrap warning in plot widget
+            y_min = truncate_to_3_decimals(min(self.signal[1]))
+            y_max = truncate_to_3_decimals(max(self.signal[1]))
 
-            y_min = y_min - y_min * 0.05 if y_min > 0 else y_min + y_min * 0.05
+            y_min = y_min - y_min * 0.2 if y_min > 0 else y_min + y_min * 0.2
 
-            self.plot_widget.setLimits(
-                xMin=-0.1, xMax=x_max + 0.1,
-                yMin=y_min, yMax=y_max + y_max * 0.05
-            )
+            self.plot_widget.setLimits(xMin = -0.5, xMax = 1.5 * x_max,
+                yMin = 1.2 * y_min, yMax = 1.2 * y_max)
             
-
     def remove_old_curve(self):
         if self.curve:
             self.plot_widget.removeItem(self.curve)
@@ -126,3 +101,6 @@ class Graph():
     
     def reset_shading_region(self):
         self.shading_region.setRegion([0, 0])
+
+def truncate_to_3_decimals(number):
+    return int(number * 1000) / 1000
