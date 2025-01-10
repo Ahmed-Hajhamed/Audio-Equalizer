@@ -4,6 +4,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import MediaPlayer
+from PyQt5.QtCore import Qt
 
 # Custom style for gray background
 gray_style = {
@@ -36,6 +37,7 @@ class SpectrogramPlot(FigureCanvas):
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.resize(1256, 818)
+        self.MainWindow = MainWindow
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.main_layout = QtWidgets.QGridLayout(self.centralwidget)
         self.graphs_layout = QtWidgets.QGridLayout()
@@ -43,11 +45,7 @@ class Ui_MainWindow(object):
         self.slider_layout = QtWidgets.QGridLayout()
         self.slider_layout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.h_layout_of_button_of_wiener = QtWidgets.QHBoxLayout()
-
-        self.original_media_player =MediaPlayer.AudioPlayerWidget()
-        self.equlized_media_player =MediaPlayer.AudioPlayerWidget()
-        self.original_media_player.set_other_players([self.equlized_media_player])
-        self.equlized_media_player.set_other_players([self.original_media_player])
+        self.sliders_layout = QtWidgets.QGridLayout()
 
         self.load_button = QtWidgets.QPushButton("Load")
         self.frequency_scale_label = QtWidgets.QLabel("Frequency Scale:")
@@ -86,6 +84,7 @@ class Ui_MainWindow(object):
         self.original_graph_label = QtWidgets.QLabel("Original Audio")
         self.speed_down_button = QtWidgets.QPushButton("Speed Down")
         self.equalized_graph_label = QtWidgets.QLabel("Equalized Audio")
+        self.reset_button = QtWidgets.QPushButton("Reset")
         self.zoom_in_button = QtWidgets.QPushButton("Zoom In")
         self.zoom_out_button = QtWidgets.QPushButton("Zoom Out")
         self.equalized_spectrogram_label = QtWidgets.QLabel("Equalized Spectrogram")
@@ -93,6 +92,11 @@ class Ui_MainWindow(object):
         self.original_spectrogram_label = QtWidgets.QLabel("Original Audio Spectrogam")
         self.line_2 = create_line()
         self.line_3 = create_line()
+
+        self.original_media_player =MediaPlayer.AudioPlayerWidget(self.speed_up_button, self.speed_down_button, self.reset_button)
+        self.equlized_media_player =MediaPlayer.AudioPlayerWidget(self.speed_up_button, self.speed_down_button, self.reset_button)
+        self.original_media_player.set_other_players([self.equlized_media_player])
+        self.equlized_media_player.set_other_players([self.original_media_player])
 
         self.controls_layout.addWidget(self.mode_comboBox, 3, 0, 1, 2)
         self.controls_layout.addWidget(self.choose_mode_label, 2, 0, 1, 2)
@@ -125,6 +129,7 @@ class Ui_MainWindow(object):
         self.graphs_layout.addWidget(self.speed_down_button, 4, 2, 1, 1)
         self.graphs_layout.addWidget(self.zoom_in_button, 4, 0, 1, 1)
         self.graphs_layout.addWidget(self.speed_up_button, 4, 3, 1, 1)
+        self.graphs_layout.addWidget(self.reset_button, 4, 4, 1, 1) 
         self.graphs_layout.addWidget(self.equalized_graph_label, 2, 0, 1, 6)
         self.graphs_layout.addWidget(self.frequency_plot.plot_widget, 5, 7, 1, 1)
         self.graphs_layout.addWidget(self.audiogram_plot, 5, 7, 1, 1)
@@ -143,6 +148,34 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         MainWindow.setWindowTitle("Audio Equalizer")
 
+    def slider_creator(self, mode_name = "Uniform Mode"):
+        self.number_of_sliders = 10 if mode_name == "Uniform Mode" else 5
+        band_layout = QtWidgets.QGridLayout()
+        self.slider_values.clear()
+        for i in range(self.number_of_sliders):
+            slider = QtWidgets.QSlider(Qt.Vertical)
+            slider.setMinimum(0)
+            slider.setMaximum(2)
+            slider.setValue(1)
+            slider.setFixedHeight(100)
+            self.MainWindow.slider_values.append(slider.value())
+            slider.valueChanged.connect(lambda value, idx=i: self.MainWindow.apply_gain(value, idx))
+            label = QtWidgets.QLabel(str(self.MainWindow.equalized_signal.frequency_names[i]))
+            label.setFixedHeight(30)
+            band_layout.addWidget(label, 1, i, 1, 1)
+            band_layout.addWidget(slider, 0, i, 1, 1)
+        return band_layout
+    
+    def switch_sliders(self):
+        while self.slider_layout.count():
+            child = self.slider_layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+        while self.sliders_layout is not None and self.sliders_layout.count():
+            child = self.sliders_layout.takeAt(0)
+            if child is not None and child.widget() :
+                child.widget().deleteLater()
+                
 def create_line():
         line = QtWidgets.QFrame()
         line.setFrameShape(QtWidgets.QFrame.VLine)

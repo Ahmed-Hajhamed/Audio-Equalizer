@@ -6,10 +6,12 @@ from PyQt5.QtGui import QIcon
 
 
 class AudioPlayerWidget(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, speed_up_button, speed_down_button, reset_button): 
+        super().__init__()
 
         self.media_player = QMediaPlayer()
+        self.playback_rate = 1.0
+        self.media_player.setPlaybackRate(self.playback_rate)
 
         self.play_button = QPushButton()
         self.play_button.clicked.connect(self.play_pause_audio)
@@ -19,6 +21,10 @@ class AudioPlayerWidget(QWidget):
         stop_button.clicked.connect(self.stop_and_reset)
         set_icon(stop_button, "icons\icons8-reset-96.png")
 
+        speed_up_button.clicked.connect(self.increase_speed)
+        speed_down_button.clicked.connect(self.decrease_speed)
+        reset_button.clicked.connect(self.reset_speed)
+        
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setRange(0, 100)
         self.slider.sliderPressed.connect(self.pause_audio_during_seek)
@@ -106,6 +112,17 @@ class AudioPlayerWidget(QWidget):
             self.media_player.pause()
             set_icon(self.play_button, "icons\play.png")
         self.is_paused = not self.is_paused
+
+    def increase_speed(self):
+        self.playback_rate += 0.1
+        self.media_player.setPlaybackRate(self.playback_rate)
+
+    def decrease_speed(self):
+        self.playback_rate -= 0.1
+        self.media_player.setPlaybackRate(max(self.playback_rate, 0.1))
+
+    def reset_speed(self):
+        self.media_player.setPlaybackRate(1.0)
 
     def remove_icons(self):
         self.play_button.setIcon(QIcon())

@@ -1,8 +1,7 @@
 import sys
 import copy
 import numpy as np
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QSlider, QLabel, QGridLayout
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 import UI
 from qt_material import apply_stylesheet
 import AudioSignal
@@ -17,7 +16,6 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.setupUi(self)
         self.current_mode = 'Uniform Mode'
         self.signal_file_path= 'audio\\A.wav'
-        self.sliders_layout = None
         self.original_signal = None
         self.equalized_signal = None
         self.number_of_sliders = 10
@@ -32,8 +30,6 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
 
         self.zoom_in_button.clicked.connect(self.original_graph.zoom_in)
         self.zoom_out_button.clicked.connect(self.original_graph.zoom_out)
-        self.speed_up_button.clicked.connect(self.original_graph.speed_up_signal)
-        self.speed_down_button.clicked.connect(self.original_graph.speed_down_signal)
 
         self.confirm_weiner_filter_button.clicked.connect(self.filter_signal)
         self.slider_of_alpha_wiener_filter.sliderReleased.connect(self.filter_signal)
@@ -69,6 +65,8 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
 
             self.original_signal.plot_spectrogram(self.original_spectrogram)
             self.original_media_player.update_song(self.signal_file_path)
+            self.original_media_player.reset_speed()
+            self.equlized_media_player.reset_speed()
             self.set_uniform_frequency_ranges()
             self.update_plots()
 
@@ -92,34 +90,6 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
                 None,  "Save Audio File", "audio", "Audio Wave (*.wav);;All Files (*)", options=options )
         sf.write(file_path, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
 
-    def slider_creator(self, mode_name = "Uniform Mode"):
-        self.number_of_sliders = 10 if mode_name == "Uniform Mode" else 5
-        band_layout = QGridLayout()
-        self.slider_values.clear()
-        for i in range(self.number_of_sliders):
-            slider = QSlider(Qt.Vertical)
-            slider.setMinimum(0)
-            slider.setMaximum(2)
-            slider.setValue(1)
-            slider.setFixedHeight(100)
-            self.slider_values.append(slider.value())
-            slider.valueChanged.connect(lambda value, idx=i: self.apply_gain(value, idx))
-            label = QLabel(str(self.equalized_signal.frequency_names[i]))
-            label.setFixedHeight(30)
-            band_layout.addWidget(label, 1, i, 1, 1)
-            band_layout.addWidget(slider, 0, i, 1, 1)
-        return band_layout
-    
-    def switch_sliders(self):
-        while self.slider_layout.count():
-            child = self.slider_layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
-        while self.sliders_layout is not None and self.sliders_layout.count():
-            child = self.sliders_layout.takeAt(0)
-            if child is not None and child.widget() :
-                child.widget().deleteLater()
-                
     def apply_gain(self, slider_value, slider_index):
         self.slider_values[slider_index] = slider_value
         self.equalized_signal.apply_gain(self.slider_values)
@@ -127,8 +97,8 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         
     def choose_mode(self):
         self.current_mode = self.mode_comboBox.currentText()
-        self.original_signal.change_mode(self.current_mode)
-        self.equalized_signal.change_mode(self.current_mode)
+        self.original_signal.change_band_edges(self.current_mode)
+        self.equalized_signal.change_band_edges(self.current_mode)
         self.equalized_signal=copy.deepcopy(self.original_signal)
         
         if self.current_mode != "Wiener Filter":
@@ -162,11 +132,8 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
                 self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 6)
                 self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 6)
             else:
-                self.original_spectrogram.setVisible(False)
-                self.equalized_spectrogram.setVisible(False)
-                self.original_spectrogram_label.setVisible(False)
-                self.equalized_spectrogram_label.setVisible(False)
-                self.line_2.setVisible(False)
+                widget.hide()
+                widget.setVisible(False)
                 self.graphs_layout.removeWidget(self.original_graph.plot_widget)
                 self.graphs_layout.removeWidget(self.equalized_graph.plot_widget)
                 self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 8)
@@ -200,11 +167,12 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
     
     def filter_signal(self):
         self.alpha_wiener_filter = self.slider_of_alpha_wiener_filter.value()
-        if len(self.original_graph.selected_data[1]) > 0 :
-            noise = self.original_graph.selected_data[1]
-            self.equalized_signal.filter_signal(noise, self.alpha_wiener_filter)
-        self.original_graph.plot_widget.region.setVisible(False)
-        self.update_plots()
+        if self.original_graph.selected_data is not None:
+            if len(self.original_graph.selected_data[1]) > 0 :
+                noise = self.original_graph.selected_data[1]
+                self.equalized_signal.filter_signal(noise, self.alpha_wiener_filter)
+            self.original_graph.plot_widget.region.setVisible(False)
+            self.update_plots()
 
 
 def hide_layout(layout):

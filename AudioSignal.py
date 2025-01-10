@@ -45,11 +45,11 @@ class Audio:
         signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100, duration= 30)
         self.time_data = np.linspace(0, len(signal_data)/ self.sampling_rate, len(signal_data))
         self.amplitude_data = signal_data
-        self.change_mode(self.mode)
+        self.change_band_edges(self.mode)
         self.compute_fft()
         self.get_full_frequency_domain()
 
-    def change_mode(self, mode):
+    def change_band_edges(self, mode):
         self.mode = mode
         self.frquencies_ranges = available_frequencies[self.mode]
         self.band_edges = list(self.frquencies_ranges.values())
