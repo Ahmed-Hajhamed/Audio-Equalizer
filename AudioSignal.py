@@ -9,11 +9,11 @@ available_frequencies = {
                     5:[100, 1000],  6:[100, 1000],
                     7:[100, 1000], 8:[100, 1000],
                     9:[100, 1000], 10:[100, 1000] },
-    'Vocals and Music': {"Letter A": [40, 400],
-              "Letter K": [400, 800],
-              "Guitar ": [950, 4000],
-              "Violin": [5000, 14000],
-              "Piano": [14000, 20000]},
+    'Vocals and Music': {"Letter A": [0, 760],
+              "Letter F": [40, 350],
+              "Guitar": [850, 1200],
+              "Violin": [500, 760],
+              "Piano": [1200, 1250]},
     'Animals and Music': {"Cow": [0, 450],
                       "Chipmunk": [450, 1100],
                       "Whale": [1100, 3000],
@@ -78,7 +78,7 @@ class Audio:
         self.modified_fft = self.fft.copy()
       
         for slider_idx, slider_value in enumerate(slider_values):
-            slider_value = 16 ** (slider_value/50)
+            # slider_value = 16 ** (slider_value/50)
             low, high = self.band_edges[slider_idx][0], self.band_edges[slider_idx][1]
             band_mask = np.where((self.frequencies >= low) & (self.frequencies < high))
             self.modified_fft[band_mask] *= slider_value

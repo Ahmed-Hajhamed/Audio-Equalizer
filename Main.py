@@ -46,6 +46,8 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.hide_show_spectrogram()
 
         self.original_graph.plot_widget.setXLink(self.equalized_graph.plot_widget)
+        self.equalized_graph.plot_widget.setXLink(self.original_graph.plot_widget)
+        self.original_graph.plot_widget.setYLink(self.equalized_graph.plot_widget)
         self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
 
     def load_signal(self):
@@ -63,7 +65,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.choose_mode()
             self.original_graph.remove_old_curve()
             self.equalized_graph.remove_old_curve()
-            self.original_graph.add_signal(self.original_signal.time_data, self.original_signal.amplitude_data)
+            self.original_graph.add_signal([self.original_signal.time_data, self.original_signal.amplitude_data])
 
             self.original_signal.plot_spectrogram(self.original_spectrogram)
             self.original_media_player.update_song(self.signal_file_path)
@@ -71,7 +73,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.update_plots()
 
     def update_plots(self):
-        self.equalized_graph.add_signal(self.equalized_signal.time_data, self.equalized_signal.amplitude_data)
+        self.equalized_graph.add_signal([self.equalized_signal.time_data, self.equalized_signal.amplitude_data])
         self.equalized_signal.get_full_frequency_domain()
         self.frequency_plot.remove_old_curve()
         self.frequency_plot.add_signal(self.equalized_signal.frequency_domain, color = 'r')
@@ -96,9 +98,9 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.slider_values.clear()
         for i in range(self.number_of_sliders):
             slider = QSlider(Qt.Vertical)
-            slider.setMinimum(-100)
-            slider.setMaximum(100)
-            slider.setValue(0)
+            slider.setMinimum(0)
+            slider.setMaximum(2)
+            slider.setValue(1)
             slider.setFixedHeight(100)
             self.slider_values.append(slider.value())
             slider.valueChanged.connect(lambda value, idx=i: self.apply_gain(value, idx))
