@@ -22,29 +22,25 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.slider_values = []
         self.noise_data = None
         self.alpha_wiener_filter = 100
-        self.linear_scale_radioButton.setChecked(True)
-        self.spectrogram_checkbox.setChecked(False)
+
         self.spectrogram_checkbox.stateChanged.connect(self.hide_show_spectrogram)
         self.load_button.clicked.connect(self.load_signal)
         self.save_button.clicked.connect(self.save_signal)
-
         self.zoom_in_button.clicked.connect(self.original_graph.zoom_in)
         self.zoom_out_button.clicked.connect(self.original_graph.zoom_out)
-
         self.confirm_weiner_filter_button.clicked.connect(self.filter_signal)
         self.slider_of_alpha_wiener_filter.sliderReleased.connect(self.filter_signal)
-
         self.mode_comboBox.currentIndexChanged.connect(self.choose_mode)
         self.linear_scale_radioButton.toggled.connect(self.switch_audiogram_linear_scale)
         self.audiogram_radioButton.toggled.connect(self.switch_audiogram_linear_scale)
-        self.load_signal()
-        self.switch_audiogram_linear_scale()
-        self.hide_show_spectrogram()
-
         self.original_graph.plot_widget.setXLink(self.equalized_graph.plot_widget)
         self.equalized_graph.plot_widget.setXLink(self.original_graph.plot_widget)
         self.original_graph.plot_widget.setYLink(self.equalized_graph.plot_widget)
         self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
+
+        self.load_signal()
+        self.switch_audiogram_linear_scale()
+        self.hide_show_spectrogram()
 
     def load_signal(self):
         if self.original_signal is None:
@@ -58,10 +54,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.equalized_signal =  copy.deepcopy(self.original_signal)
             self.file_name_label.setText(self.original_signal.signal_name)
 
-            self.original_graph.remove_old_curve()
-            self.equalized_graph.remove_old_curve()
             self.original_graph.add_signal([self.original_signal.time_data, self.original_signal.amplitude_data])
-
             self.original_signal.plot_spectrogram(self.original_spectrogram)
             self.original_media_player.update_song(self.signal_file_path)
             self.original_media_player.reset_speed()
@@ -69,10 +62,16 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.set_uniform_frequency_ranges()
             self.choose_mode()
 
+    def save_signal(self):
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getSaveFileName(
+                None,  "Save Audio File", "audio", "Audio Wave (*.wav)", options=options)
+        if file_path:
+            sf.write(file_path, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
+
     def update_plots(self):
         self.equalized_graph.add_signal([self.equalized_signal.time_data, self.equalized_signal.amplitude_data])
         self.equalized_signal.get_full_frequency_domain()
-        self.frequency_plot.remove_old_curve()
         self.frequency_plot.add_signal(self.equalized_signal.frequency_domain, color = 'r')
         
         if self.spectrogram_checkbox.isChecked():
@@ -82,12 +81,6 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             Audiogram.plotAudiogram(self.equalized_signal.amplitude_data, 
                                     self.equalized_signal.sampling_rate, self.audiogram_plot)
         self.update_audio_palyer()
-        
-    def save_signal(self):
-        options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getSaveFileName(
-                None,  "Save Audio File", "audio", "Audio Wave (*.wav);;All Files (*)", options=options )
-        sf.write(file_path, self.equalized_signal.amplitude_data, self.equalized_signal.sampling_rate)
 
     def apply_gain(self, slider_value, slider_index):
         self.slider_values[slider_index] = slider_value
@@ -101,54 +94,21 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.equalized_signal=copy.deepcopy(self.original_signal)
         
         if self.current_mode != "Wiener Filter":
-            show_layout(self.sliders_layout)
-            hide_layout(self.h_layout_of_button_of_wiener)
+            UI.show_layout(self.sliders_layout)
+            UI.hide_layout(self.h_layout_of_button_of_wiener)
 
             self.switch_sliders()
             self.graphs_layout.removeItem(self.slider_layout)
             self.graphs_layout.removeItem(self.sliders_layout)
             self.sliders_layout=self.slider_creator(mode_name= self.current_mode)
             self.graphs_layout.addLayout(self.sliders_layout, 5, 0, 1, 6)
-        else :
-            hide_layout(self.sliders_layout)
-            show_layout(self.h_layout_of_button_of_wiener)
-
-        if self.current_mode == "Wiener Filter" :
-            self.original_graph.plot_widget.set_selection_mode(True)
-        else:
             self.original_graph.plot_widget.set_selection_mode(False)
+        else :
+            UI.hide_layout(self.sliders_layout)
+            UI.show_layout(self.h_layout_of_button_of_wiener)
+            self.original_graph.plot_widget.set_selection_mode(True)
+
         self.update_plots()
-
-    def hide_show_spectrogram(self):
-        widgets = [self.original_spectrogram, self.equalized_spectrogram,
-                    self.original_spectrogram_label, self.equalized_spectrogram_label, self.line_2]
-        for widget in widgets:
-            if self.spectrogram_checkbox.isChecked():
-                widget.show()
-                widget.setVisible(True)
-                self.graphs_layout.removeWidget(self.original_graph.plot_widget)
-                self.graphs_layout.removeWidget(self.equalized_graph.plot_widget)
-                self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 6)
-                self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 6)
-            else:
-                widget.hide()
-                widget.setVisible(False)
-                self.graphs_layout.removeWidget(self.original_graph.plot_widget)
-                self.graphs_layout.removeWidget(self.equalized_graph.plot_widget)
-                self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 8)
-                self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 8)
-        self.update_plots()
-
-    def switch_audiogram_linear_scale(self):
-        if self.linear_scale_radioButton.isChecked():
-            self.frequency_plot.plot_widget.setVisible(True)
-            self.audiogram_plot.setVisible(False)
-            self.frequency_plot_label.setText("Linear Scale Frequency")
-
-        elif self.audiogram_radioButton.isChecked():
-            self.frequency_plot.plot_widget.setVisible(False)
-            self.audiogram_plot.setVisible(True)
-            self.frequency_plot_label.setText("Audiogram Scale")
 
     def update_audio_palyer(self):
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
@@ -174,22 +134,6 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.update_plots()
 
 
-def hide_layout(layout):
-    if layout is None:
-        return
-    for i in range(layout.count()):
-        widget = layout.itemAt(i).widget()
-        if widget is not None:
-            widget.hide()
-
-def show_layout(layout):
-    if layout is None:
-        return
-    for i in range(layout.count()):
-        widget = layout.itemAt(i).widget()
-        if widget is not None:
-            widget.show()  # Show each widget
-    
 app = QApplication(sys.argv)
 window = MainWindow()
 apply_stylesheet(app, theme='dark_cyan.xml')

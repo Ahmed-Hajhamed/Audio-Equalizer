@@ -57,7 +57,9 @@ class Ui_MainWindow(object):
         self.linear_scale_radioButton = QtWidgets.QRadioButton("Linear Scale")
         self.save_button = QtWidgets.QPushButton("Save")
         self.line = create_line()
-
+        self.linear_scale_radioButton.setChecked(True)
+        self.spectrogram_checkbox.setChecked(False)
+        
         self.controls_layout.addWidget(self.load_button, 1, 0, 1, 1)
         self.controls_layout.addWidget(self.frequency_scale_label, 5, 0, 1, 2)
 
@@ -148,6 +150,37 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         MainWindow.setWindowTitle("Audio Equalizer")
 
+    def hide_show_spectrogram(self):
+        widgets = [self.original_spectrogram, self.equalized_spectrogram,
+                    self.original_spectrogram_label, self.equalized_spectrogram_label, self.line_2]
+        for widget in widgets:
+            if self.spectrogram_checkbox.isChecked():
+                widget.show()
+                widget.setVisible(True)
+                self.graphs_layout.removeWidget(self.original_graph.plot_widget)
+                self.graphs_layout.removeWidget(self.equalized_graph.plot_widget)
+                self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 6)
+                self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 6)
+            else:
+                widget.hide()
+                widget.setVisible(False)
+                self.graphs_layout.removeWidget(self.original_graph.plot_widget)
+                self.graphs_layout.removeWidget(self.equalized_graph.plot_widget)
+                self.graphs_layout.addWidget(self.original_graph.plot_widget, 1, 0, 1, 8)
+                self.graphs_layout.addWidget(self.equalized_graph.plot_widget, 3, 0, 1, 8)
+        self.MainWindow.update_plots()
+
+    def switch_audiogram_linear_scale(self):
+        if self.linear_scale_radioButton.isChecked():
+            self.frequency_plot.plot_widget.setVisible(True)
+            self.audiogram_plot.setVisible(False)
+            self.frequency_plot_label.setText("Linear Scale Frequency")
+
+        elif self.audiogram_radioButton.isChecked():
+            self.frequency_plot.plot_widget.setVisible(False)
+            self.audiogram_plot.setVisible(True)
+            self.frequency_plot_label.setText("Audiogram Scale")
+            
     def slider_creator(self, mode_name = "Uniform Mode"):
         self.number_of_sliders = 10 if mode_name == "Uniform Mode" else 5
         band_layout = QtWidgets.QGridLayout()
@@ -181,3 +214,20 @@ def create_line():
         line.setFrameShape(QtWidgets.QFrame.VLine)
         line.setFrameShadow(QtWidgets.QFrame.Sunken)
         return line
+
+def hide_layout(layout):
+    if layout is None:
+        return
+    for i in range(layout.count()):
+        widget = layout.itemAt(i).widget()
+        if widget is not None:
+            widget.hide()
+
+def show_layout(layout):
+    if layout is None:
+        return
+    for i in range(layout.count()):
+        widget = layout.itemAt(i).widget()
+        if widget is not None:
+            widget.show()  # Show each widget
+    

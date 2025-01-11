@@ -22,7 +22,7 @@ available_frequencies = {
     'Wiener Filter': {"test":0}}
 
 class Audio:
-    def __init__(self, mode, file_path=None):
+    def __init__(self, mode = None, file_path=None):
         self.mode = mode
         self.time_data = None
         self.amplitude_data = None
@@ -34,9 +34,9 @@ class Audio:
         self.band_edges = None
         self.frequency_names = None
         self.frquencies_ranges = None
+        self.file_path = file_path
 
         if file_path is not None:
-            self.file_path = file_path
             self.load_signal()
 
     def load_signal(self):
