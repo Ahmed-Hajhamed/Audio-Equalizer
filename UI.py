@@ -59,7 +59,7 @@ class Ui_MainWindow(object):
         self.line = create_line()
         self.linear_scale_radioButton.setChecked(True)
         self.spectrogram_checkbox.setChecked(False)
-        
+
         self.controls_layout.addWidget(self.load_button, 1, 0, 1, 1)
         self.controls_layout.addWidget(self.frequency_scale_label, 5, 0, 1, 2)
 
@@ -180,6 +180,7 @@ class Ui_MainWindow(object):
             self.frequency_plot.plot_widget.setVisible(False)
             self.audiogram_plot.setVisible(True)
             self.frequency_plot_label.setText("Audiogram Scale")
+        self.MainWindow.update_plots()  
             
     def slider_creator(self, mode_name = "Uniform Mode"):
         self.number_of_sliders = 10 if mode_name == "Uniform Mode" else 5
