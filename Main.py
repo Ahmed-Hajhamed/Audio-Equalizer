@@ -14,7 +14,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.current_mode = 'Uniform Mode'
+        self.current_mode = self.mode_comboBox.currentText()
         self.signal_file_path= 'audio\\A.wav'
         self.original_signal = None
         self.equalized_signal = None
@@ -57,8 +57,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.original_signal= AudioSignal.Audio(mode=self.current_mode, file_path=self.signal_file_path)
             self.equalized_signal =  copy.deepcopy(self.original_signal)
             self.file_name_label.setText(self.original_signal.signal_name)
-            
-            self.choose_mode()
+
             self.original_graph.remove_old_curve()
             self.equalized_graph.remove_old_curve()
             self.original_graph.add_signal([self.original_signal.time_data, self.original_signal.amplitude_data])
@@ -68,7 +67,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.original_media_player.reset_speed()
             self.equlized_media_player.reset_speed()
             self.set_uniform_frequency_ranges()
-            self.update_plots()
+            self.choose_mode()
 
     def update_plots(self):
         self.equalized_graph.add_signal([self.equalized_signal.time_data, self.equalized_signal.amplitude_data])
@@ -161,7 +160,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             max_freq = np.max(self.original_signal.frequencies)
             start, end = 0, max_freq/10
             for i in range (1, 11):
-                self.original_signal.frquencies_ranges[i]=[(start), (end)]
+                AudioSignal.available_frequencies['Uniform Mode'][i]=[(start), (end)]
                 start += max_freq/10
                 end += max_freq/10 
     
