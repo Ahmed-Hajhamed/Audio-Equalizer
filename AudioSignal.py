@@ -9,16 +9,16 @@ available_frequencies = {
                     5:[100, 1000],  6:[100, 1000],
                     7:[100, 1000], 8:[100, 1000],
                     9:[100, 1000], 10:[100, 1000] },
-    'Vocals and Music': {"Letter A": [0, 760],
-              "Letter F": [40, 350],
-              "Guitar": [850, 1200],
-              "Violin": [500, 760],
-              "Piano": [1200, 1250]},
-    'Animals and Music': {"Cow": [0, 450],
-                      "Chipmunk": [450, 1100],
-                      "Whale": [1100, 3000],
-                      "Acoordion": [3000, 9000],
-                      "Trumpet": [10000, 12000]},
+    'Vocals and Music': {"Letter A": [[180, 270], [370, 510], [620, 760], [2400, 5000]],
+              "Letter F": [[180, 270],[600, 770],  [960, 1060], [1060, 1270]],
+              "Letter K": [[100, 1150]],
+              "Violin": [[0, 130]],
+              "Piano": [[2400, 5000]]}, # 3550
+    'Animals and Music': {"Cow": [[0, 450]],
+                      "Chipmunk": [[450, 1100]],
+                      "Whale": [[1100, 3000]],
+                      "Acoordion": [[3000, 9000]],
+                      "Trumpet": [[10000, 12000]]},
     'Wiener Filter': {"test":0}}
 
 class Audio:
@@ -79,18 +79,34 @@ class Audio:
       
         for slider_idx, slider_value in enumerate(slider_values):
             # slider_value = 16 ** (slider_value/50)
-            low, high = self.band_edges[slider_idx][0], self.band_edges[slider_idx][1]
-            band_mask = np.where((self.frequencies >= low) & (self.frequencies < high))
-            self.modified_fft[band_mask] *= slider_value
-            self.modified_fft[-band_mask[0]] *= slider_value
+            for range in self.band_edges[slider_idx]:
+                low, high = range[0], range[1]
+                band_mask = np.where((self.frequencies >= low) & (self.frequencies < high))
+                self.modified_fft[band_mask] *= slider_value
+                self.modified_fft[-band_mask[0]] *= slider_value
         self.reconstruct_signal()
     
-    def filter_signal(self, noise_detected, alpha):
+    def filter_signal(self, noise_detected, alpha, magnify=False):
         alpha = 1 if alpha == 0 else alpha
         psd_signal = np.abs(self.fft) ** 2
         psd_noise = alpha * np.abs(np.fft.fft(noise_detected, n=len(self.amplitude_data))) ** 2
-        wiener_ = psd_signal / (psd_signal + psd_noise + 1e-10)  # Add small value to avoid division by zero
-        self.modified_fft = wiener_ * self.fft
+        wiener_weight = psd_signal / (psd_signal + psd_noise + 1e-10) if not magnify\
+            else (psd_signal + psd_noise) / (psd_signal + 1e-10)
+        self.modified_fft = wiener_weight * self.fft
+        self.reconstruct_signal()
+    
+    def remove_formants(self, formants):
+        for formant in formants:
+            formant = formant.upper()
+            if formant == 'A':
+                formant_data = librosa.load('audio\\audios_test\\A_vocals.mp3', sr=44100, duration= 0.6)[0]
+                self.filter_signal(formant_data, 200)
+            elif formant == 'F':
+                formant_data = librosa.load('audio\\audios_test\\F_vocals.mp3', sr=44100, duration= 1)[0]
+                self.filter_signal(formant_data, 200)
+            elif formant == 'K':
+                formant_data = librosa.load('audio\\audios_test\\K_vocals.mp3', sr=44100, duration= 2)[0]
+                self.filter_signal(formant_data, 200)
         self.reconstruct_signal()
 
     def reconstruct_signal(self):

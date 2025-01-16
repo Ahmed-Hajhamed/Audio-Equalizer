@@ -2,7 +2,7 @@ import sys
 import copy
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
-import UI
+import equalizer_ui
 from qt_material import apply_stylesheet
 import AudioSignal
 import Audiogram
@@ -10,7 +10,7 @@ import soundfile as sf
 import tempfile
 
 
-class MainWindow(QMainWindow, UI.Ui_MainWindow):
+class MainWindow(QMainWindow, equalizer_ui.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -28,7 +28,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.save_button.clicked.connect(self.save_signal)
         self.zoom_in_button.clicked.connect(self.original_graph.zoom_in)
         self.zoom_out_button.clicked.connect(self.original_graph.zoom_out)
-        self.confirm_weiner_filter_button.clicked.connect(self.filter_signal)
+        self.confirm_weiner_filter_button.clicked.connect(self.remove_formants)
         self.slider_of_alpha_wiener_filter.sliderReleased.connect(self.filter_signal)
         self.mode_comboBox.currentIndexChanged.connect(self.choose_mode)
         self.linear_scale_radioButton.toggled.connect(self.switch_audiogram_linear_scale)
@@ -46,7 +46,7 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         if self.original_signal is None:
             file_path = self.signal_file_path
         else:
-            file_path, _ = QFileDialog.getOpenFileName(self, "Select File", "audio", "All Files (*);;Text Files (*.txt)")
+            file_path, _ = QFileDialog.getOpenFileName(self, "Select File", "audio\\audios_test", "Audio Files  *.wav *.mp3 *.m4a")
             
         if file_path:
             self.signal_file_path=file_path
@@ -59,6 +59,8 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.original_media_player.update_song(self.signal_file_path)
             self.original_media_player.reset_speed()
             self.equlized_media_player.reset_speed()
+            # self.equalized_graph.plot_widget.setYRange(min(self.original_signal.amplitude_data),
+            #                                             max(self.original_signal.amplitude_data))
             self.set_uniform_frequency_ranges()
             self.choose_mode()
 
@@ -94,18 +96,17 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
         self.equalized_signal=copy.deepcopy(self.original_signal)
         
         if self.current_mode != "Wiener Filter":
-            UI.show_layout(self.sliders_layout)
-            UI.hide_layout(self.h_layout_of_button_of_wiener)
+            equalizer_ui.show_layout(self.sliders_layout)
+            equalizer_ui.hide_layout(self.h_layout_of_button_of_wiener)
 
             self.switch_sliders()
-            self.graphs_layout.removeItem(self.slider_layout)
-            self.graphs_layout.removeItem(self.sliders_layout)
+            self.main_layout.removeItem(self.sliders_layout)
             self.sliders_layout=self.slider_creator(mode_name= self.current_mode)
-            self.graphs_layout.addLayout(self.sliders_layout, 5, 0, 1, 6)
+            self.main_layout.addLayout(self.sliders_layout, 1, 2, 1, 1)
             self.original_graph.plot_widget.set_selection_mode(False)
         else :
-            UI.hide_layout(self.sliders_layout)
-            UI.show_layout(self.h_layout_of_button_of_wiener)
+            equalizer_ui.hide_layout(self.sliders_layout)
+            equalizer_ui.show_layout(self.h_layout_of_button_of_wiener)
             self.original_graph.plot_widget.set_selection_mode(True)
 
         self.update_plots()
@@ -133,6 +134,9 @@ class MainWindow(QMainWindow, UI.Ui_MainWindow):
             self.original_graph.plot_widget.region.setVisible(False)
             self.update_plots()
 
+    def remove_formants(self):
+        self.equalized_signal.remove_formants(['F'])
+        self.update_plots()
 
 app = QApplication(sys.argv)
 window = MainWindow()
