@@ -54,7 +54,7 @@ def plotAudiogram(data, sampling_rate, audiogram_plot):
     audiogram_plot.axes.set_xticks(transformed_ticks)
     audiogram_plot.axes.set_xticklabels([str(tick) for tick in original_ticks])
     audiogram_plot.axes.invert_yaxis()
-    audiogram_plot.axes.set_title("Audiogram")
+    # audiogram_plot.axes.set_title("Audiogram")
     audiogram_plot.axes.set_xlabel("Frequency (Hz)")
     audiogram_plot.axes.set_ylabel("Hearing Threshold (dB HL)")
     audiogram_plot.axes.set_yticks(range(-10, 150, 10))  

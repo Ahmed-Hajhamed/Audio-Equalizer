@@ -40,7 +40,6 @@ class Audio:
             self.load_signal()
 
     def load_signal(self):
-        """Load signal data from a CSV, MP3 or mav file."""
         self.signal_name = os.path.splitext(os.path.basename(self.file_path))[0]
         signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100, duration= 30)
         self.time_data = np.linspace(0, len(signal_data)/ self.sampling_rate, len(signal_data))
@@ -127,7 +126,7 @@ class Audio:
                                       shading='gouraud', cmap='plasma', vmin=canvas.vmin, vmax=canvas.vmax)
         canvas.axes.set_xlabel("Time (s)")
         canvas.axes.set_ylabel("Frequency (Hz)")
-        canvas.axes.set_title("Spectrogram")
+        # canvas.axes.set_title("Spectrogram")
 
         if not hasattr(canvas, 'colorbar') or canvas.colorbar is None:
             canvas.colorbar = canvas.figure.colorbar(cax, ax=canvas.axes)

@@ -35,8 +35,8 @@ class MainWindow(QMainWindow, equalizer_ui.Ui_MainWindow):
         self.audiogram_radioButton.toggled.connect(self.switch_audiogram_linear_scale)
         self.original_graph.plot_widget.setXLink(self.equalized_graph.plot_widget)
         self.equalized_graph.plot_widget.setXLink(self.original_graph.plot_widget)
-        self.original_graph.plot_widget.setYLink(self.equalized_graph.plot_widget)
-        self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
+        # self.original_graph.plot_widget.setYLink(self.equalized_graph.plot_widget)
+        # self.equalized_graph.plot_widget.setYLink(self.original_graph.plot_widget)
 
         self.load_signal()
         self.switch_audiogram_linear_scale()
@@ -121,7 +121,7 @@ class MainWindow(QMainWindow, equalizer_ui.Ui_MainWindow):
             max_freq = np.max(self.original_signal.frequencies)
             start, end = 0, max_freq/10
             for i in range (1, 11):
-                AudioSignal.available_frequencies['Uniform Mode'][i]=[(start), (end)]
+                AudioSignal.available_frequencies['Uniform Mode'][i]=[[(start), (end)]]
                 start += max_freq/10
                 end += max_freq/10 
     

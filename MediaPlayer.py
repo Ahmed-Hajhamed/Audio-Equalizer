@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import QPushButton, QGridLayout, QWidget, QSlider, QLabel
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import QUrl, Qt, QTimer, QSize
 from PyQt5.QtGui import QPixmap, QIcon
@@ -14,10 +14,12 @@ class AudioPlayerWidget(QWidget):
         self.media_player.setPlaybackRate(self.playback_rate)
 
         self.play_button = QPushButton()
+        self.play_button.setMaximumWidth(40)
         self.play_button.clicked.connect(self.play_pause_audio)
         set_icon(self.play_button,"icons\play.png" )
 
         stop_button = QPushButton()
+        stop_button.setMaximumWidth(40)
         stop_button.clicked.connect(self.stop_and_reset)
         set_icon(stop_button, "icons\icons8-reset-96.png")
 
@@ -29,24 +31,19 @@ class AudioPlayerWidget(QWidget):
         self.slider.setRange(0, 100)
         self.slider.sliderPressed.connect(self.pause_audio_during_seek)
         self.slider.sliderReleased.connect(self.seek_position)
+        self.slider.setFixedWidth(200)
 
         self.time_label = QLabel("0:00")
+        self.time_label.setMaximumWidth(50)
         self.media_player.positionChanged.connect(self.update_slider)
         self.media_player.durationChanged.connect(self.update_duration)
 
-        control_layout = QHBoxLayout()
-        control_layout.addWidget(self.play_button)
-        control_layout.addWidget(stop_button)
-
-        slider_layout = QVBoxLayout()
-        slider_layout.addWidget(self.slider)
-        slider_layout.addWidget(self.time_label)
-
-        main_layout = QVBoxLayout()
-        main_layout.addLayout(control_layout)
-        main_layout.addLayout(slider_layout)
-
-        self.setLayout(main_layout)
+        self.main_layout = QGridLayout()
+        self.main_layout.addWidget(self.play_button, 0, 0, 1, 1)
+        self.main_layout.addWidget(stop_button, 0, 1, 1, 1)
+        self.main_layout.addWidget(self.slider, 1, 0, 1, 2)
+        self.main_layout.addWidget(self.time_label, 2, 0, 1, 1)
+        # self.setLayout(self.main_layout)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_time_label)
