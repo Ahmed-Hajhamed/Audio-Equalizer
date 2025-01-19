@@ -42,7 +42,7 @@ class Audio:
 
     def load_signal(self):
         self.signal_name = os.path.splitext(os.path.basename(self.file_path))[0]
-        signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100, offset=411, duration= 9)
+        signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100, offset=0, duration= 30)
         self.time_data = np.linspace(0, len(signal_data)/ self.sampling_rate, len(signal_data))
         self.amplitude_data = signal_data
         self.change_band_edges(self.mode)
