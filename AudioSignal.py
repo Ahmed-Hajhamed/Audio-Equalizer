@@ -14,10 +14,11 @@ available_frequencies = {
               "Letter K": [[100, 1150]],
               "Violin": [[0, 130]],
               "Piano": [[2400, 5000]]}, # 3550
-    'Animals and Music': {"Cow": [[0, 450]],
-                      "Chipmunk": [[450, 1100]],
-                      "Whale": [[1100, 3000]],
-                      "Acoordion": [[3000, 9000]],
+    'Animals and Music': {"Whale": [[20, 300]],
+                      "Elephant": [[250, 1000]],
+                      "Dolphin": [[1000, 2400]],
+                      "Bat": [[4000, 8000]],
+                    #   "Acoordion": [[3000, 9000]],
                       "Trumpet": [[10000, 12000]]},
     'Wiener Filter': {"test":0}}
 
@@ -41,7 +42,7 @@ class Audio:
 
     def load_signal(self):
         self.signal_name = os.path.splitext(os.path.basename(self.file_path))[0]
-        signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100, duration= 30)
+        signal_data, self.sampling_rate = librosa.load(self.file_path, sr=44100, offset=411, duration= 9)
         self.time_data = np.linspace(0, len(signal_data)/ self.sampling_rate, len(signal_data))
         self.amplitude_data = signal_data
         self.change_band_edges(self.mode)
@@ -96,16 +97,22 @@ class Audio:
     
     def remove_formants(self, formants):
         for formant in formants:
-            formant = formant.upper()
-            if formant == 'A':
+            formant = formant.lower()
+            if formant == 'a':
                 formant_data = librosa.load('audio\\audios_test\\A_vocals.mp3', sr=44100, duration= 0.6)[0]
                 self.filter_signal(formant_data, 200)
-            elif formant == 'F':
+            elif formant == 'f':
                 formant_data = librosa.load('audio\\audios_test\\F_vocals.mp3', sr=44100, duration= 1)[0]
                 self.filter_signal(formant_data, 200)
-            elif formant == 'K':
+            elif formant == 'k':
                 formant_data = librosa.load('audio\\audios_test\\K_vocals.mp3', sr=44100, duration= 2)[0]
                 self.filter_signal(formant_data, 200)
+            elif formant == 'acoordion':
+                formant_data = librosa.load('audio\\musical instruments.wav', sr=22050, offset=114, duration= 14)[0]
+                self.filter_signal(formant_data, 1000)
+            elif formant == 'bagpipes':
+                formant_data = librosa.load('audio\\musical instruments.wav', sr=22050, offset=411, duration= 9)[0]
+                self.filter_signal(formant_data, 1000)
         self.reconstruct_signal()
 
     def reconstruct_signal(self):

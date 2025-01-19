@@ -15,7 +15,7 @@ class MainWindow(QMainWindow, equalizer_ui.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.current_mode = self.mode_comboBox.currentText()
-        self.signal_file_path= 'audio\\A.wav'
+        self.signal_file_path="audio\\musical instruments.wav"
         self.original_signal = None
         self.equalized_signal = None
         self.number_of_sliders = 10
@@ -135,7 +135,7 @@ class MainWindow(QMainWindow, equalizer_ui.Ui_MainWindow):
             self.update_plots()
 
     def remove_formants(self):
-        self.equalized_signal.remove_formants(['F'])
+        self.equalized_signal.remove_formants(['Bagpipes'])
         self.update_plots()
 
 app = QApplication(sys.argv)
