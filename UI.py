@@ -1,4 +1,3 @@
-
 from PyQt5 import QtWidgets
 import Graph
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -6,7 +5,6 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import MediaPlayer
 from PyQt5.QtCore import Qt
-from qt_material import apply_stylesheet
 
 # Custom style for gray background
 gray_style = {
