@@ -37,9 +37,6 @@ class Graph:
             self.curve = self.plot_widget.plot(signal[0], signal[1], pen=color)        
             self.set_plot_limits()
 
-    def off_signal(self):
-        self.graph_1.setLimits(xMin=0, xMax=2, yMin=-2, yMax=2)
-
     def zoom_in(self):
         x_range = self.plot_widget.viewRange()[0]
         y_range = self.plot_widget.viewRange()[1]
