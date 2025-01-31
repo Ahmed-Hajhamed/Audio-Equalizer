@@ -16,13 +16,6 @@ def fourierTansformWave(audio=[], sampfreq=440010):
 
     return fourier_transform_dB , fourier_transform_freq
 
-def modify_wave (magnitude  , freq , start_index , end_index , new_magnitude  ) : 
-    for i in range ( len(magnitude)):
-        if  freq[i] >= start_index:
-            if freq[i] < end_index:
-                freq[i] = new_magnitude
-    return magnitude 
-
 def get_audiogram_data(fourier_dB, fourier_freq):
     audiogram_frequencies = [0, 50, 100, 200, 400, 800 , 1600 , 2000 , 4000, 8000, 16000, 20000]
     audiogram_dB = []

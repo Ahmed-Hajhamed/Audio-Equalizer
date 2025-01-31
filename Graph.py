@@ -37,10 +37,6 @@ class Graph:
             self.curve = self.plot_widget.plot(signal[0], signal[1], pen=color)        
             self.set_plot_limits()
 
-    def update_plot(self):
-        if self.signal is not None:
-            self.curve.setData(self.signal[0], self.signal[1], pen="green")
-
     def off_signal(self):
         self.graph_1.setLimits(xMin=0, xMax=2, yMin=-2, yMax=2)
 
@@ -63,7 +59,6 @@ class Graph:
                                    y_range[1] + 0.1 * (y_range[1] - y_range[0]), padding=0)
 
     def set_plot_limits(self):
-        """Set the plot limits based on the loaded data."""
         if len(self.signal[0]) > 0:
             x_max = truncate_to_3_decimals(self.signal[0][-1]) # Take 3 decimals to wrap warning in plot widget
             y_min = truncate_to_3_decimals(min(self.signal[1]))
@@ -71,19 +66,9 @@ class Graph:
 
             y_min = y_min - y_min * 0.2 if y_min > 0 else y_min + y_min * 0.2
 
-            self.plot_widget.setLimits(xMin = -0.5, xMax = 1.5 * x_max,
+            self.plot_widget.setLimits(xMin = -0.5, xMax = 1.1 * x_max,
                 yMin = 1.2 * y_min, yMax = 1.2 * y_max)
             
-    def remove_old_curve(self):
-        if self.curve:
-            self.plot_widget.removeItem(self.curve)
-
-    def speed_up_signal(self):
-        pass
-    
-    def speed_down_signal(self):
-        pass
-    
     def on_region_changed(self):
         """Handle changes in the selected region."""
         if self.plot_widget.region:
@@ -98,9 +83,6 @@ class Graph:
         """Update playback line and shading region."""
         current_time = value/1000
         self.shading_region.setRegion([0, current_time])
-    
-    def reset_shading_region(self):
-        self.shading_region.setRegion([0, 0])
 
 def truncate_to_3_decimals(number):
     return int(number * 1000) / 1000

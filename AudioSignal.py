@@ -4,22 +4,16 @@ import librosa
 from scipy.signal import spectrogram
 
 available_frequencies = {
-    'Uniform Mode': {1:[100, 1000], 2:[100, 1000],
-                     3:[100, 1000], 4:[100, 1000],
-                    5:[100, 1000],  6:[100, 1000],
-                    7:[100, 1000], 8:[100, 1000],
-                    9:[100, 1000], 10:[100, 1000] },
-    'Vocals and Music': {"Letter A": [[180, 270], [370, 510], [620, 760], [2400, 5000]],
-              "Letter F": [[180, 270],[600, 770],  [960, 1060], [1060, 1270]],
-              "Letter K": [[100, 1150]],
-              "Violin": [[0, 130]],
-              "Piano": [[2400, 5000]]}, # 3550
+    'Uniform Mode': {1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[], 9:[], 10:[]},
+   
+    'Vocals and Music': {"E": [[]], "F": [[]], "H": [[]], "Xylophone": [[]], "Chimes": [[]]},
+
     'Animals and Music': {"Whale": [[20, 300]],
                       "Elephant": [[250, 1000]],
                       "Dolphin": [[1000, 2400]],
                       "Bat": [[4000, 8000]],
-                    #   "Acoordion": [[3000, 9000]],
-                      "Trumpet": [[10000, 12000]]},
+                      "Triangle": [[9000, 13000]],},
+
     'Wiener Filter': {"test":0}}
 
 class Audio:
@@ -78,7 +72,6 @@ class Audio:
         self.modified_fft = self.fft.copy()
       
         for slider_idx, slider_value in enumerate(slider_values):
-            # slider_value = 16 ** (slider_value/50)
             for range in self.band_edges[slider_idx]:
                 low, high = range[0], range[1]
                 band_mask = np.where((self.frequencies >= low) & (self.frequencies < high))
@@ -86,34 +79,41 @@ class Audio:
                 self.modified_fft[-band_mask[0]] *= slider_value
         self.reconstruct_signal()
     
-    def filter_signal(self, noise_detected, alpha, magnify=False):
+    def apply_wiener_filter(self, noise_detected, alpha, magnify=False):
         alpha = 1 if alpha == 0 else alpha
         psd_signal = np.abs(self.fft) ** 2
         psd_noise = alpha * np.abs(np.fft.fft(noise_detected, n=len(self.amplitude_data))) ** 2
-        wiener_weight = psd_signal / (psd_signal + psd_noise + 1e-10) if not magnify\
-            else (psd_signal + psd_noise) / (psd_signal + 1e-10)
-        self.modified_fft = wiener_weight * self.fft
+        if magnify:
+            wiener_weight = psd_noise / (psd_signal + psd_noise + 1e-10)
+            wiener_weight = 1 + 4 * wiener_weight
+        else:
+            wiener_weight = psd_signal / (psd_signal + psd_noise + 1e-10)
+        self.modified_fft = wiener_weight * self.modified_fft
         self.reconstruct_signal()
-    
-    def remove_formants(self, formants):
-        for formant in formants:
-            formant = formant.lower()
-            if formant == 'a':
-                formant_data = librosa.load('audio\\audios_test\\A_vocals.mp3', sr=44100, duration= 0.6)[0]
-                self.filter_signal(formant_data, 200)
-            elif formant == 'f':
-                formant_data = librosa.load('audio\\audios_test\\F_vocals.mp3', sr=44100, duration= 1)[0]
-                self.filter_signal(formant_data, 200)
-            elif formant == 'k':
-                formant_data = librosa.load('audio\\audios_test\\K_vocals.mp3', sr=44100, duration= 2)[0]
-                self.filter_signal(formant_data, 200)
-            elif formant == 'acoordion':
-                formant_data = librosa.load('audio\\musical instruments.wav', sr=22050, offset=114, duration= 14)[0]
-                self.filter_signal(formant_data, 1000)
-            elif formant == 'bagpipes':
-                formant_data = librosa.load('audio\\musical instruments.wav', sr=22050, offset=411, duration= 9)[0]
-                self.filter_signal(formant_data, 1000)
-        self.reconstruct_signal()
+
+    def remove_formants(self, value, formant):
+        magnify = False
+        if value ==1:
+            return
+        elif value == 2:
+            magnify = True
+
+        formant = formant.lower()
+        if formant == 'e':
+            formant_data = np.load('formant_data\\formant_data_e.npy')
+            self.apply_wiener_filter(formant_data, 200, magnify)
+        elif formant == 'f':
+            formant_data = np.load('formant_data\\formant_data_f.npy')
+            self.apply_wiener_filter(formant_data, 200, magnify)
+        elif formant == 'h':
+            formant_data = np.load('formant_data\\formant_data_h.npy')
+            self.apply_wiener_filter(formant_data, 200, magnify)
+        elif formant == 'xylophone':
+            formant_data = np.load('formant_data\\formant_data_xylophone.npy')
+            self.apply_wiener_filter(formant_data, 200, magnify)
+        elif formant == 'glockenspiel':
+            formant_data = np.load('formant_data\\formant_data_chimes.npy')
+            self.apply_wiener_filter(formant_data, 200, magnify)
 
     def reconstruct_signal(self):
         self.amplitude_data = np.fft.ifft(self.modified_fft).real

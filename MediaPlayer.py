@@ -43,7 +43,6 @@ class AudioPlayerWidget(QWidget):
         self.main_layout.addWidget(stop_button, 0, 1, 1, 1)
         self.main_layout.addWidget(self.slider, 1, 0, 1, 2)
         self.main_layout.addWidget(self.time_label, 2, 0, 1, 1)
-        # self.setLayout(self.main_layout)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_time_label)
@@ -123,7 +122,6 @@ class AudioPlayerWidget(QWidget):
 
     def remove_icons(self):
         self.play_button.setIcon(QIcon())
-
 
 def set_icon(button, icon_path):
     pixmap = QPixmap(icon_path)
